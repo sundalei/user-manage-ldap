@@ -1,24 +1,17 @@
 # Setup an OpenLDAP server running in Docker
 
-## Start a container
+## Start a container with docker compose
 
 ```bash
-docker container run --name my-openldap-server \
--p 389:389 \
--p 636:636 \
---detach \
--e LDAP_ORGANISATION="SpringFramework Org" \
--e LDAP_DOMAIN="springframework.org" \
--e LDAP_ADMIN_PASSWORD="password" \
-osixia/openldap:1.5.0 --copy-service --loglevel debug
+docker compose up -d
 ```
 
 ## Populate sample data
 
 ```bash
-docker cp users.ldif my-openldap-server:/
+docker cp users.ldif openldap-server:/
 
-docker container exec -it my-openldap-server ldapadd -x -D "cn=admin,dc=springframework,dc=org" -w password -f /users.ldif
+docker container exec -it openldap-server ldapadd -x -D "cn=admin,dc=springframework,dc=org" -w password -f /users.ldif
 ```
 
 ## Verify data loaded
