@@ -1,0 +1,11 @@
+spring:
+  ldap:
+    urls:
+    base: dc=springframework,dc=org
+    embedded:
+      ldif: classpath:test-users.ldif
+      base-dn: dc=springframework,dc=org
+      port: 0
+      credential:
+        username: uid=admin
+        password: secret

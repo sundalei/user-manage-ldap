@@ -5,8 +5,8 @@ import com.example.entity.User;
 import com.example.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,9 +33,35 @@ public class UserController {
     }
 
     @GetMapping("/{uid}")
-    public Optional<UserDTO> findUserByUid(@PathVariable String uid) {
-        Optional<User> user = userService.findUserByUid(uid);
-        return user.map(this::convertToUserDTO);
+    public UserDTO findUserByUid(@PathVariable String uid) {
+        User user = userService.findUserByUid(uid)
+                .orElseThrow(() -> new RuntimeException("User not found with uid: " + uid));
+
+        return convertToUserDTO(user);
+    }
+
+    @GetMapping("/surname/{surname}")
+    public List<UserDTO> findBySurname(@PathVariable String surname) {
+        return userService.findBySurname(surname)
+                .stream().map(this::convertToUserDTO)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/cn/{commonName}/sn/{surname}")
+    public List<UserDTO> findByCnAndSn(@PathVariable String commonName, @PathVariable String surname) {
+        return userService.findByCnAndSn(commonName, surname)
+                .stream().map(this::convertToUserDTO)
+                .collect(Collectors.toList());
+    }
+
+    @PutMapping("/{uid}")
+    public void updateUser(@PathVariable String uid, @RequestBody UserDTO userDTO) {
+        userService.updateUser(uid, convertToUser(userDTO));
+    }
+
+    @DeleteMapping("/{uid}")
+    public void deleteUser(@PathVariable String uid) {
+        userService.deleteUser(uid);
     }
 
     private UserDTO convertToUserDTO(User user) {
@@ -43,7 +69,7 @@ public class UserController {
         userDTO.setCommonName(user.getCommonName());
         userDTO.setSn(user.getSn());
         userDTO.setUid(user.getUid());
-        userDTO.setUserPassword(UserDTO.asciiValuesToString(user.getUserPassword()));
+        userDTO.setUserPassword(new String(user.getUserPassword(), StandardCharsets.UTF_8));
         return userDTO;
     }
 
@@ -52,7 +78,7 @@ public class UserController {
         user.setCommonName(userDTO.getCommonName());
         user.setSn(userDTO.getSn());
         user.setUid(userDTO.getUid());
-        user.setUserPassword(userDTO.getUserPassword());
+        user.setUserPassword(userDTO.getUserPassword().getBytes(java.nio.charset.StandardCharsets.UTF_8));
         return user;
     }
 

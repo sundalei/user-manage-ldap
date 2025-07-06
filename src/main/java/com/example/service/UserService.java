@@ -32,4 +32,26 @@ public class UserService {
 	public List<User> findBySurname(String surname) {
 		return userRepository.findBySn(surname);
 	}
+
+	public List<User> findByCnAndSn(String commonName, String surname) {
+		return userRepository.findByCnAndSn(commonName, surname);
+	}
+
+	public void updateUser(String uid, User userUpdates) {
+		User existingUser = userRepository.findByUid(uid)
+				.orElseThrow(() -> new RuntimeException("User not found with uid: " + uid));
+
+		// Update attributes from the request
+		existingUser.setCommonName(userUpdates.getCommonName());
+		existingUser.setSn(userUpdates.getSn());
+		existingUser.setUserPassword(userUpdates.getUserPassword());
+
+		userRepository.save(existingUser);
+	}
+
+	public void deleteUser(String uid) {
+		User userToDelete = userRepository.findByUid(uid)
+				.orElseThrow(() -> new RuntimeException("User not found with uid: " + uid));
+		userRepository.delete(userToDelete);
+	}
 }

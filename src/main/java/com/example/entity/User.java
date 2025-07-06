@@ -27,7 +27,8 @@ public class User {
     @DnAttribute(value = "uid", index = 1)
     private String uid;
 
-    private String userPassword;
+    @Attribute(name = "userPassword", type = Attribute.Type.BINARY)
+    private byte[] userPassword;
 
     public Name getDn() {
         return dn;
@@ -61,11 +62,12 @@ public class User {
         this.uid = uid;
     }
 
-    public String getUserPassword() {
+    public byte[] getUserPassword() {
         return userPassword;
     }
 
-    public void setUserPassword(String userPassword) {
+    public void setUserPassword(byte[] userPassword) {
+        //this.userPassword = plaintextPassword.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         this.userPassword = userPassword;
     }
     
