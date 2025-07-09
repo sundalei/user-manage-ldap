@@ -27,8 +27,8 @@ This project uses Docker Compose to quickly set up an OpenLDAP server and a phpL
 2.  **Populate Sample Data:**
     The `users.ldif` file in the root directory contains sample user data. To populate the LDAP server with this data:
     ```bash
-    docker cp users.ldif openldap-server:/users.ldif
-    docker exec -it openldap-server ldapadd -x -D "cn=admin,dc=springframework,dc=org" -w password -f /users.ldif
+    docker container cp users.ldif openldap-server:/users.ldif
+    docker container exec -it openldap-server ldapadd -x -D "cn=admin,dc=springframework,dc=org" -w password -f /users.ldif
     ```
     *   The first command copies the `users.ldif` file into the `openldap-server` container.
     *   The second command uses `ldapadd` utility within the container to add the entries from the LDIF file.
