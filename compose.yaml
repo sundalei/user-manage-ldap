@@ -2,7 +2,7 @@ services:
   openldap:
     image: osixia/openldap:1.5.0
     container_name: openldap-server
-    hostname: my-openldap-server
+    hostname: openldap-server
     ports:
       - "389:389"
       - "636:636"
@@ -18,7 +18,7 @@ services:
       - ldap_admin_password
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "ldapsearch", "-x", "-H", "ldap://localhost", "-b", "", "-s", "base", "(objectclass=*)"]
+      test: ["CMD", "bash", "-c", "ldapsearch -x -H ldap://localhost -b dc=springframework,dc=org -D cn=admin,dc=springframework,dc=org -w \"$(cat /run/secrets/ldap_admin_password)\""]
       interval: 30s
       timeout: 10s
       retries: 5
