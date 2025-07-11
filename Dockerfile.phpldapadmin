@@ -1,3 +1,4 @@
+# checkov:skip=CKV_DOCKER_3 Justification: The base image requires root for startup scripts and service management.
 FROM osixia/phpldapadmin:0.9.0
 
 RUN sed -i '/nginx/d' /etc/apt/sources.list \
