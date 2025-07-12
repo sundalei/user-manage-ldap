@@ -69,32 +69,56 @@ public final class UserController {
     return convertToUserDTO(user);
   }
 
+  /**
+   * This method finds users by their surname.
+   *
+   * @param surname This is the user's surname.
+   * @return A list of user data transfer objects.
+   */
   @GetMapping("/surname/{surname}")
-  public List<UserDTO> findBySurname(@PathVariable String surname) {
+  public List<UserDTO> findBySurname(final @PathVariable String surname) {
     return userService.findBySurname(surname).stream()
         .map(this::convertToUserDTO)
         .collect(Collectors.toList());
   }
 
+  /**
+   * This method finds users by their common name and surname.
+   *
+   * @param commonName This is the user's common name.
+   * @param surname This is the user's surname.
+   * @return A list of user data transfer objects.
+   */
   @GetMapping("/cn/{commonName}/sn/{surname}")
   public List<UserDTO> findByCnAndSn(
-      @PathVariable String commonName, @PathVariable String surname) {
+      final @PathVariable String commonName, final @PathVariable String surname) {
     return userService.findByCnAndSn(commonName, surname).stream()
         .map(this::convertToUserDTO)
         .collect(Collectors.toList());
   }
 
+  /**
+   * This method updates a user.
+   *
+   * @param uid This is the user's uid.
+   * @param userDTO This is the user data transfer object.
+   */
   @PutMapping("/{uid}")
-  public void updateUser(@PathVariable String uid, @RequestBody UserDTO userDTO) {
+  public void updateUser(final @PathVariable String uid, final @RequestBody UserDTO userDTO) {
     userService.updateUser(uid, convertToUser(userDTO));
   }
 
+  /**
+   * This method deletes a user.
+   *
+   * @param uid This is the user's uid.
+   */
   @DeleteMapping("/{uid}")
-  public void deleteUser(@PathVariable String uid) {
+  public void deleteUser(final @PathVariable String uid) {
     userService.deleteUser(uid);
   }
 
-  private UserDTO convertToUserDTO(User user) {
+  private UserDTO convertToUserDTO(final User user) {
     UserDTO userDTO = new UserDTO();
     userDTO.setCommonName(user.getCommonName());
     userDTO.setSn(user.getSn());
@@ -103,13 +127,12 @@ public final class UserController {
     return userDTO;
   }
 
-  private User convertToUser(UserDTO userDTO) {
+  private User convertToUser(final UserDTO userDTO) {
     User user = new User();
     user.setCommonName(userDTO.getCommonName());
     user.setSn(userDTO.getSn());
     user.setUid(userDTO.getUid());
-    user.setUserPassword(
-        userDTO.getUserPassword().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    user.setUserPassword(userDTO.getUserPassword().getBytes(StandardCharsets.UTF_8));
     return user;
   }
 }
