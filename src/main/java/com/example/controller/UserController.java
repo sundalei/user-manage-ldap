@@ -15,29 +15,52 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/** This class is a controller for handling user-related requests. */
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public final class UserController {
 
+  /** This is the user service for handling user-related business logic. */
   private final UserService userService;
 
-  public UserController(final UserService userService) {
-    this.userService = userService;
+  /**
+   * This is the constructor for the UserController class.
+   *
+   * @param newUserService This is the user service for handling user-related business logic.
+   */
+  public UserController(final UserService newUserService) {
+    this.userService = newUserService;
   }
 
+  /**
+   * This method creates a new user.
+   *
+   * @param userDTO This is the user data transfer object.
+   */
   @PostMapping
-  public void createUser(@RequestBody UserDTO userDTO) {
+  public void createUser(final @RequestBody UserDTO userDTO) {
     userService.createUser(convertToUser(userDTO));
   }
 
+  /**
+   * This method finds all users.
+   *
+   * @return A list of user data transfer objects.
+   */
   @GetMapping
   public List<UserDTO> findAllUsers() {
     List<User> users = userService.findAllUsers();
     return users.stream().map(this::convertToUserDTO).collect(Collectors.toList());
   }
 
+  /**
+   * This method finds a user by their uid.
+   *
+   * @param uid This is the user's uid.
+   * @return The user data transfer object.
+   */
   @GetMapping("/{uid}")
-  public UserDTO findUserByUid(@PathVariable String uid) {
+  public UserDTO findUserByUid(final @PathVariable String uid) {
     User user =
         userService
             .findUserByUid(uid)
