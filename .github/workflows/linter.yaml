@@ -33,3 +33,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FAIL_ON_ERROR: false
+          LINTER_RULES_PATH: .github
+          JAVA_CHECKSTYLE_CONFIG: checkstyle.xml
