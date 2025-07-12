@@ -4,6 +4,10 @@
     "http://checkstyle.sourceforge.net/dtds/configuration_1_3.dtd">
 <module name="Checker">
   <module name="TreeWalker">
+    <module name="LineLength">
+      <property name="max" value="120"/>
+      <property name="ignorePattern" value="^package.*?;$|^import.*?;$"/>
+    </module>
     <module name="WhitespaceAround">
       <property name="allowEmptyMethods" value="true"/>
     </module>
