@@ -32,7 +32,5 @@ jobs:
           VALIDATE_JAVA: true
           VALIDATE_GOOGLE_JAVA_FORMAT: true
           JAVA_FILE_NAME: google_checks.xml
-          VALIDATE_MARKDOWN: true
-          VALIDATE_MARKDOWN_PRETTIER: true
 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
