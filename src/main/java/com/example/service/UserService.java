@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public final class UserService {
 
-  /** This is the user repository for handling user-related database operations. */
+  /** The user repository for database operations. */
   private final UserRepository userRepository;
 
   /**
