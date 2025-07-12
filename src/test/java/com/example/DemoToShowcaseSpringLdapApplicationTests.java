@@ -7,5 +7,5 @@ import org.springframework.boot.test.context.SpringBootTest;
 class DemoToShowcaseSpringLdapApplicationTests {
 
   @Test
-  void contextLoads() {}
+  void contextLoads() { }
 }
