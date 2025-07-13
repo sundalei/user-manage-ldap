@@ -22,7 +22,12 @@ public class UserController {
   /** Service to handle user-related operations. */
   private final UserService userService;
 
-  public UserController(UserService userService) {
+  /**
+   * Constructor to initialize UserController with UserService.
+   *
+   * @param userService Service to handle user-related operations
+   */
+  public UserController(final UserService userService) {
     this.userService = userService;
   }
 
