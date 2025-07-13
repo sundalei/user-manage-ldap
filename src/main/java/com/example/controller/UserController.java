@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 public class UserController {
 
+  /** Service to handle user-related operations. */
   private final UserService userService;
 
   public UserController(UserService userService) {
