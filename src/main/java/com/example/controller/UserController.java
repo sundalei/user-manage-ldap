@@ -138,7 +138,7 @@ public final class UserController {
    * @param userDTO Data Transfer Object to convert
    * @return User entity containing user information
    */
-  private User convertToUser(UserDTO userDTO) {
+  private User convertToUser(final UserDTO userDTO) {
     User user = new User();
     user.setCommonName(userDTO.getCommonName());
     user.setSn(userDTO.getSn());

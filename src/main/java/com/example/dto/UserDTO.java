@@ -5,12 +5,18 @@ import java.util.stream.Stream;
 
 public class UserDTO {
 
+  /** Common name of the user. */
   private String commonName;
+
+  /** Surname of the user. */
   private String sn;
+
+  /** UID of the user. */
   private String uid;
+
+  /** Password of the user. */
   private String userPassword;
 
-  // Getters and Setters
   public String getCommonName() {
     return commonName;
   }
