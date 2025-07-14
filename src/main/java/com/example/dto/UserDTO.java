@@ -3,7 +3,7 @@ package com.example.dto;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class UserDTO {
+public final class UserDTO {
 
   /** Common name of the user. */
   private String commonName;
@@ -21,7 +21,7 @@ public class UserDTO {
     return commonName;
   }
 
-  public void setCommonName(String commonName) {
+  public void setCommonName(final String commonName) {
     this.commonName = commonName;
   }
 
@@ -29,7 +29,7 @@ public class UserDTO {
     return sn;
   }
 
-  public void setSn(String sn) {
+  public void setSn(final String sn) {
     this.sn = sn;
   }
 
@@ -37,7 +37,7 @@ public class UserDTO {
     return uid;
   }
 
-  public void setUid(String uid) {
+  public void setUid(final String uid) {
     this.uid = uid;
   }
 
@@ -45,7 +45,7 @@ public class UserDTO {
     return userPassword;
   }
 
-  public void setUserPassword(String userPassword) {
+  public void setUserPassword(final String userPassword) {
     this.userPassword = userPassword;
   }
 

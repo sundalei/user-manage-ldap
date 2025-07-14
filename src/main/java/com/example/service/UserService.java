@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public final class UserService {
 
-  /** user repository */
+  /** user repository. */
   private final UserRepository userRepository;
 
   /**

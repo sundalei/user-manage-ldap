@@ -51,6 +51,7 @@
     <module name="JavadocStyle"/>
     <module name="MissingJavadocMethod">
       <property name="ignoreMethodNamesRegex" value="^main$"/>
+      <property name="allowMissingPropertyJavadoc" value="true"/>
     </module>
 
     <module name="ConstantName"/>
