@@ -33,4 +33,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JAVA_FILE_NAME: my_checks.xml
-          JSCPD_CONFIG_FILE: .github/linters/.jscpd.json
+          JSCPD_LINTER_RULES: .github/linters/.jscpd.json
