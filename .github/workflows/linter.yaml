@@ -34,3 +34,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JAVA_FILE_NAME: my_checks.xml
           JSCPD_LINTER_RULES: .github/linters/.jscpd.json
+          FIX_MARKDOWN_PRETTIER: true
