@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class UserRepositoryIT {
 
+  /** user repository. */
   @Autowired private UserRepository userRepository;
 
   @Test

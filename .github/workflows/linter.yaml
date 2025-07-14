@@ -2,8 +2,10 @@
 name: Lint
 
 on:
-  push: null
-  pull_request: null
+  push:
+    branches:
+      - main
+  pull_request:
 
 permissions: {}
 
@@ -29,8 +31,7 @@ jobs:
       - name: Super-linter
         uses: super-linter/super-linter@v7.4.0
         env:
-          VALIDATE_JAVA: true
-          VALIDATE_GOOGLE_JAVA_FORMAT: true
-          JAVA_FILE_NAME: google_checks.xml
-
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JAVA_FILE_NAME: my_checks.xml
+          JSCPD_LINTER_RULES: .github/linters/.jscpd.json
+          FIX_MARKDOWN_PRETTIER: true
