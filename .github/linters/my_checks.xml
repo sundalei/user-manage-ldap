@@ -5,12 +5,13 @@
 
 <module name="Checker">
   <property name="severity" value="error"/>
+
   <property name="fileExtensions" value="java, properties, xml"/>
+  
   <module name="BeforeExecutionExclusionFileFilter">
     <property name="fileNamePattern" value="module\-info\.java$"/>
   </module>
 
-  <!-- https://checkstyle.org/filters/suppressionfilter.html -->
   <module name="SuppressionFilter">
     <property name="file" value="${org.checkstyle.sun.suppressionfilter.config}"
               default="checkstyle-suppressions.xml" />
@@ -34,6 +35,7 @@
   <module name="FileLength"/>
   <module name="LineLength">
     <property name="fileExtensions" value="java"/>
+    <property name="max" value="8"/>
   </module>
 
   <!-- Checks for whitespace                               -->
