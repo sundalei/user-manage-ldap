@@ -45,8 +45,8 @@ This project uses Docker Compose to quickly set up an OpenLDAP server and a phpL
 
 - **Using ldapsearch:**
   `bash
-      docker exec -it openldap-server ldapsearch -x -H ldap://localhost -b "dc=springframework,dc=org" -D "cn=admin,dc=springframework,dc=org" -w password "(uid=dbrown)"
-      `
+    docker exec -it openldap-server ldapsearch -x -H ldap://localhost -b "dc=springframework,dc=org" -D "cn=admin,dc=springframework,dc=org" -w password "(uid=dbrown)"
+    `
   This command searches for the user with `uid=dbrown`.
 - **Using phpLDAPadmin:**
   Navigate to `http://localhost:6080` in your web browser.
