@@ -37,18 +37,29 @@ public final class UserController {
    * @param userDTO Data Transfer Object containing user information
    */
   @PostMapping
-  public void createUser(@RequestBody UserDTO userDTO) {
+  public void createUser(final @RequestBody UserDTO userDTO) {
     userService.createUser(convertToUser(userDTO));
   }
 
+  /**
+   * Retrieves all users.
+   *
+   * @return List of UserDTO containing user information
+   */
   @GetMapping
   public List<UserDTO> findAllUsers() {
     List<User> users = userService.findAllUsers();
     return users.stream().map(this::convertToUserDTO).collect(Collectors.toList());
   }
 
+  /**
+   * Retrieves a user by UID.
+   *
+   * @param uid UID of the user to retrieve
+   * @return UserDTO containing user information
+   */
   @GetMapping("/{uid}")
-  public UserDTO findUserByUid(@PathVariable String uid) {
+  public UserDTO findUserByUid(final @PathVariable String uid) {
     User user =
         userService
             .findUserByUid(uid)
@@ -57,32 +68,62 @@ public final class UserController {
     return convertToUserDTO(user);
   }
 
+  /**
+   * Retrieves users by surname.
+   *
+   * @param surname Surname of the users to retrieve
+   * @return List of UserDTO containing user information
+   */
   @GetMapping("/surname/{surname}")
-  public List<UserDTO> findBySurname(@PathVariable String surname) {
+  public List<UserDTO> findBySurname(final @PathVariable String surname) {
     return userService.findBySurname(surname).stream()
         .map(this::convertToUserDTO)
         .collect(Collectors.toList());
   }
 
+  /**
+   * Retrieves users by common name and surname.
+   *
+   * @param commonName Common name of the users to retrieve
+   * @param surname Surname of the users to retrieve
+   * @return List of UserDTO containing user information
+   */
   @GetMapping("/cn/{commonName}/sn/{surname}")
   public List<UserDTO> findByCnAndSn(
-      @PathVariable String commonName, @PathVariable String surname) {
+      final @PathVariable String commonName, final @PathVariable String surname) {
     return userService.findByCnAndSn(commonName, surname).stream()
         .map(this::convertToUserDTO)
         .collect(Collectors.toList());
   }
 
+  /**
+   * Updates a user by UID.
+   *
+   * @param uid UID of the user to update
+   * @param userDTO Data Transfer Object containing updated user information
+   */
   @PutMapping("/{uid}")
-  public void updateUser(@PathVariable String uid, @RequestBody UserDTO userDTO) {
+  public void updateUser(final @PathVariable String uid, final @RequestBody UserDTO userDTO) {
     userService.updateUser(uid, convertToUser(userDTO));
   }
 
+  /**
+   * Deletes a user by UID.
+   *
+   * @param uid UID of the user to delete
+   */
   @DeleteMapping("/{uid}")
-  public void deleteUser(@PathVariable String uid) {
+  public void deleteUser(final @PathVariable String uid) {
     userService.deleteUser(uid);
   }
 
-  private UserDTO convertToUserDTO(User user) {
+  /**
+   * Converts a User entity to a UserDTO Data Transfer Object.
+   *
+   * @param user User entity to convert
+   * @return UserDTO containing user information
+   */
+  private UserDTO convertToUserDTO(final User user) {
     UserDTO userDTO = new UserDTO();
     userDTO.setCommonName(user.getCommonName());
     userDTO.setSn(user.getSn());
@@ -91,6 +132,12 @@ public final class UserController {
     return userDTO;
   }
 
+  /**
+   * Converts a UserDTO Data Transfer Object to a User entity.
+   *
+   * @param userDTO Data Transfer Object to convert
+   * @return User entity containing user information
+   */
   private User convertToUser(UserDTO userDTO) {
     User user = new User();
     user.setCommonName(userDTO.getCommonName());
