@@ -127,11 +127,12 @@
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
 
-    <!-- Checks for class design                         -->
-    <!-- See https://checkstyle.org/checks/design/index.html -->
     <module name="DesignForExtension"/>
     <module name="FinalClass"/>
-    <module name="HideUtilityClassConstructor"/>
+    <module name="HideUtilityClassConstructor">
+      <property name="ignoreAnnotatedBy"
+        value="SpringBootApplication, java.lang.Deprecated"/>
+    </module>
     <module name="InterfaceIsType"/>
     <module name="VisibilityModifier"/>
 
