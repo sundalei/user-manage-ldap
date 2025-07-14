@@ -49,6 +49,12 @@ public final class UserDTO {
     this.userPassword = userPassword;
   }
 
+  /**
+   * Converts a string of ASCII values to a string of characters.
+   *
+   * @param asciiValues Comma-separated string of ASCII values
+   * @return String of characters
+   */
   public static String asciiValuesToString(String asciiValues) {
     return Stream.of(asciiValues.split(","))
         .map(Integer::parseInt)
