@@ -21,8 +21,8 @@ This project uses Docker Compose to quickly set up an OpenLDAP server and a phpL
     docker compose up -d
     ```
     This command will download the necessary images (if not already present) and start the `openldap-server` and `phpldapadmin-ui` containers in detached mode.
-  * OpenLDAP will be accessible on `ldap://localhost:389`.
-  * phpLDAPadmin will be accessible at `http://localhost:6080`.
+* OpenLDAP will be accessible on `ldap://localhost:389`.
+* phpLDAPadmin will be accessible at `http://localhost:6080`.
 
 2. **Populate Sample Data:**
     The `users.ldif` file in the root directory contains sample user data. To populate the LDAP server with this data:
@@ -30,21 +30,21 @@ This project uses Docker Compose to quickly set up an OpenLDAP server and a phpL
     docker container cp users.ldif openldap-server:/users.ldif
     docker container exec -it openldap-server ldapadd -x -D "cn=admin,dc=springframework,dc=org" -w password -f /users.ldif
     ```
-  * The first command copies the `users.ldif` file into the `openldap-server` container.
-  * The second command uses `ldapadd` utility within the container to add the entries from the LDIF file.
-    * `-x`: Use simple authentication.
-    * `-D "cn=admin,dc=springframework,dc=org"`: Bind DN (Distinguished Name) for the admin user.
-    * `-w password`: Password for the admin user (as configured in `compose.yaml` and `application.yml`).
-    * `-f /users.ldif`: Specifies the LDIF file to process.
+* The first command copies the `users.ldif` file into the `openldap-server` container.
+* The second command uses `ldapadd` utility within the container to add the entries from the LDIF file.
+  * `-x`: Use simple authentication.
+  * `-D "cn=admin,dc=springframework,dc=org"`: Bind DN (Distinguished Name) for the admin user.
+  * `-w password`: Password for the admin user (as configured in `compose.yaml` and `application.yml`).
+  * `-f /users.ldif`: Specifies the LDIF file to process.
 
 3. **Verify Data (Optional):**
     You can verify that the data has been loaded using `ldapsearch` or by browsing via phpLDAPadmin.
-  * **Using ldapsearch:**
+* **Using ldapsearch:**
         ```bash
         docker exec -it openldap-server ldapsearch -x -H ldap://localhost -b "dc=springframework,dc=org" -D "cn=admin,dc=springframework,dc=org" -w password "(uid=dbrown)"
         ```
         This command searches for the user with `uid=dbrown`.
-  * **Using phpLDAPadmin:**
+* **Using phpLDAPadmin:**
         Navigate to `http://localhost:6080` in your web browser.
         Login with DN: `cn=admin,dc=springframework,dc=org` and Password: `password`.
         You should see the `dc=springframework,dc=org` base and the `ou=groups` organizational unit containing the sample users.
@@ -110,25 +110,25 @@ The project follows a standard Spring Boot application structure:
 * **`com.example.exception`**:
   * `GlobalExceptionHandler.java`: Uses `@RestControllerAdvice` to provide centralized exception handling for the application, converting specific LDAP exceptions and others into appropriate HTTP responses.
 
-*   **`com.example.repository`**:
-    *   `UserRepository.java`: A Spring Data LDAP repository interface extending `LdapRepository`. It provides standard CRUD methods and allows defining custom query methods (e.g., `findByUid`, `findBySn`).
-    *   `UserRepositoryCustom.java`: An interface for custom repository methods that require more complex LDAP queries.
-    *   `impl/UserRepositoryImpl.java`: Implementation of `UserRepositoryCustom`, using `LdapTemplate` to construct and execute custom LDAP queries.
+* **`com.example.repository`**:
+  * `UserRepository.java`: A Spring Data LDAP repository interface extending `LdapRepository`. It provides standard CRUD methods and allows defining custom query methods (e.g., `findByUid`, `findBySn`).
+  * `UserRepositoryCustom.java`: An interface for custom repository methods that require more complex LDAP queries.
+  * `impl/UserRepositoryImpl.java`: Implementation of `UserRepositoryCustom`, using `LdapTemplate` to construct and execute custom LDAP queries.
 
-*   **`com.example.service`**:
-    *   `UserService.java`: Contains the business logic for user management. It acts as an intermediary between the `UserController` and the `UserRepository`, orchestrating operations like creating, finding, updating, and deleting users.
+* **`com.example.service`**:
+  * `UserService.java`: Contains the business logic for user management. It acts as an intermediary between the `UserController` and the `UserRepository`, orchestrating operations like creating, finding, updating, and deleting users.
 
-### Key Configuration Files:
+### Key Configuration Files
 
-*   **`pom.xml`**: The Maven Project Object Model file. It defines project dependencies (Spring Boot starters for Web and LDAP, testing libraries), build configurations, and project metadata.
-*   **`src/main/resources/application.yml`**: The main application configuration file.
-    *   `spring.application.name`: Sets the application name.
-    *   `spring.ldap.*`: Configures the connection to the primary OpenLDAP server (URL, base DN, admin username, and password).
-*   **`src/test/resources/application.yml`**: Configuration specific to tests.
-    *   `spring.ldap.embedded.*`: Configures an embedded LDAP server for integration tests, including the LDIF file (`test-users.ldif`) to load, the base DN, and port.
-*   **`compose.yaml`**: Docker Compose file defining the `openldap` and `phpldapadmin` services, their images, ports, environment variables, and volumes.
-*   **`users.ldif`**: Contains sample data for the development LDAP server.
-*   **`src/test/resources/test-users.ldif`**: Contains sample data for the embedded LDAP server used during tests.
+* **`pom.xml`**: The Maven Project Object Model file. It defines project dependencies (Spring Boot starters for Web and LDAP, testing libraries), build configurations, and project metadata.
+* **`src/main/resources/application.yml`**: The main application configuration file.
+  * `spring.application.name`: Sets the application name.
+  * `spring.ldap.*`: Configures the connection to the primary OpenLDAP server (URL, base DN, admin username, and password).
+* **`src/test/resources/application.yml`**: Configuration specific to tests.
+  * `spring.ldap.embedded.*`: Configures an embedded LDAP server for integration tests, including the LDIF file (`test-users.ldif`) to load, the base DN, and port.
+* **`compose.yaml`**: Docker Compose file defining the `openldap` and `phpldapadmin` services, their images, ports, environment variables, and volumes.
+* **`users.ldif`**: Contains sample data for the development LDAP server.
+* **`src/test/resources/test-users.ldif`**: Contains sample data for the embedded LDAP server used during tests.
 
 ## API Endpoints
 
