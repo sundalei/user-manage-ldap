@@ -1,3 +1,4 @@
+---
 services:
   openldap:
     image: osixia/openldap:1.5.0
@@ -18,7 +19,12 @@ services:
       - ldap_admin_password
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "bash", "-c", "ldapsearch -x -H ldap://localhost -b dc=springframework,dc=org -s base -D cn=admin,dc=springframework,dc=org -w \"$(cat /run/secrets/ldap_admin_password)\""]
+      test: |-
+        ldapsearch -x -H ldap://localhost \
+          -b dc=springframework,dc=org \
+          -s base \
+          -D cn=admin,dc=springframework,dc=org \
+          -w "$(cat /run/secrets/ldap_admin_password)"
       interval: 30s
       timeout: 10s
       retries: 5
