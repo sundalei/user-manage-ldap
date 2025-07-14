@@ -6,4 +6,8 @@
   <suppress
     files="[\\/]com[\\/]example[\\/]dto[\\/]UserDto\.java$"
     checks="DesignForExtensionCheck"/>
+  <suppress
+    checks="FinalParametersCheck"
+    files="\.java$"
+    methods="^main$"/>
 </suppressions>
