@@ -11,7 +11,7 @@ import org.springframework.ldap.odm.annotations.Id;
 @Entry(
     base = "ou=groups",
     objectClasses = {"inetOrgPerson", "organizationalPerson", "person", "top"})
-public class User {
+public final class User {
 
   /** DN of the user. */
   @Id
