@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public final class UserController {
 
   /** Service to handle user-related operations. */
   private final UserService userService;
@@ -31,6 +31,11 @@ public class UserController {
     this.userService = userService;
   }
 
+  /**
+   * Creates a new user.
+   *
+   * @param userDTO Data Transfer Object containing user information
+   */
   @PostMapping
   public void createUser(@RequestBody UserDTO userDTO) {
     userService.createUser(convertToUser(userDTO));

@@ -32,8 +32,6 @@
     <property name="max" value="120"/>
   </module>
 
-  <!-- Checks for whitespace                               -->
-  <!-- See https://checkstyle.org/checks/whitespace/index.html -->
   <module name="FileTabCharacter"/>
 
   <!-- Miscellaneous other checks.                   -->
@@ -121,7 +119,9 @@
     <!-- See https://checkstyle.org/checks/coding/index.html -->
     <module name="EmptyStatement"/>
     <module name="EqualsHashCode"/>
-    <module name="HiddenField"/>
+    <module name="HiddenField">
+      <property name="ignoreConstructorParameter" value="true"/>
+    </module>
     <module name="IllegalInstantiation"/>
     <module name="InnerAssignment"/>
     <module name="MagicNumber"/>
