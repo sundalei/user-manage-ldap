@@ -39,7 +39,7 @@ WORKDIR /app
 ARG JAR_FILE=target/*.jar
 
 # Copy the built JAR from the 'build' stage into the final image
-COPY --from=build /app/${JAR_FILE} app.jar
+COPY --from=build --chown=springuser:spring /app/${JAR_FILE} app.jar
 
 # Expose the port the application runs on
 EXPOSE 8080
@@ -50,4 +50,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # Command to run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
