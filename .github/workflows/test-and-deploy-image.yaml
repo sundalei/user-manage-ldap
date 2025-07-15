@@ -44,7 +44,7 @@ jobs:
           docker image inspect user-manage-ldap:${{ github.run_id }}
 
       - name: Run Trivy for all CVEs (non-blocking)
-        uses: aquasecurity/trivy-action@v3
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: user-manage-ldap:${{ github.run_id }}
           format: table
