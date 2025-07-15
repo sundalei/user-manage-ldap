@@ -33,7 +33,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           load: true
-          tags: ${{ github.run_id }}
+          tags: user-manage-ldap:${{ github.run_id }}
           target: test
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -41,9 +41,16 @@ jobs:
 
       - name: Inspect image
         run: |
-          docker image inspect ${{ github.run_id }}
+          docker image inspect user-manage-ldap:${{ github.run_id }}
 
-      - name: Docker meta
+      - name: Run Trivy for all CVEs (non-blocking)
+        uses: aquasecurity/trivy-action@v3
+        with:
+          image-ref: user-manage-ldap:${{ github.run_id }}
+          format: table
+          exit-code: 0
+
+      - name: Docker metadata for final image build
         id: docker_meta
         uses: docker/metadata-action@v5
         with:
@@ -56,7 +63,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
 
-      - name: Docker build
+      - name: Docker build and push to Docker Hub
         uses: docker/build-push-action@v6
         with:
           push: true
