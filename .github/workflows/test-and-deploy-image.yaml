@@ -42,6 +42,11 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
 
+      - name: Log Docker Metadata
+        run: |
+          echo "Tags: ${{ steps.docker_meta.outputs.tags }}"
+          echo "Labels: ${{ steps.docker_meta.outputs.labels }}"
+
       - name: Docker build
         uses: docker/build-push-action@v6
         with:
