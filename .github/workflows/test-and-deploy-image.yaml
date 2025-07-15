@@ -29,6 +29,20 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Build and export to Docker
+        uses: docker/build-push-action@v6
+        with:
+          load: true
+          tags: ${{ github.run_id }}
+          target: test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/arm64
+
+      - name: Inspect image
+        run: |
+          docker image inspect ${{ github.run_id }}
+
       - name: Docker meta
         id: docker_meta
         uses: docker/metadata-action@v5
