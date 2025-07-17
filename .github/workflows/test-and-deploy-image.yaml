@@ -10,6 +10,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  security-events: write
 
 jobs:
   build-image:
@@ -17,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -32,6 +36,7 @@ jobs:
       - name: Build and export to Docker
         uses: docker/build-push-action@v6
         with:
+          push: false
           load: true
           tags: user-manage-ldap:${{ github.run_id }}
           target: test
@@ -49,6 +54,23 @@ jobs:
           image-ref: user-manage-ldap:${{ github.run_id }}
           format: table
           exit-code: 0
+
+      - name: Run Trivy for HIGH and CRITICAL CVEs and report (blocking)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: user-manage-ldap:${{ github.run_id }}
+          exit-code: 1
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy scan results to Github Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
 
       - name: Docker metadata for final image build
         id: docker_meta
