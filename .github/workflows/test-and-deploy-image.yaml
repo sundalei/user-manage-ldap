@@ -80,18 +80,15 @@ jobs:
           skip-setup-trivy: true
           scanners: vuln
 
-      # This step now prints a table of only CRITICAL vulnerabilities for debugging.
-      - name: Debug - Find CRITICAL vulnerabilities
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: user-manage-ldap:${{ github.run_id }}
-          exit-code: 0 # Temporarily set to 0 to prevent failure
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL
-          format: table # Force table output for easy reading in logs
-          skip-setup-trivy: true
-          scanners: vuln
+      # This new step directly checks the SARIF file for critical issues.
+      - name: Check for CRITICAL vulnerabilities in SARIF report
+        run: |
+          if grep -q '"level": "critical"' trivy-results.sarif; then
+            echo "CRITICAL vulnerabilities found in trivy-results.sarif. Failing the build."
+            exit 1
+          else
+            echo "No CRITICAL vulnerabilities found. Build can continue."
+          fi
 
       - name: Upload Trivy scan results to Github Security tab
         uses: github/codeql-action/upload-sarif@v3
