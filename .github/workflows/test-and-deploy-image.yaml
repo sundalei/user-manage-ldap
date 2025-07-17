@@ -98,6 +98,7 @@ jobs:
       - name: Run Integration Tests
         run: |
           export TESTING_IMAGE=${{ github.run_id }}:integration-test
+          export LDAP_ADMIN_PASSWORD=${{ secrets.LDAP_ADMIN_PASSWORD }}
           docker compose -f compose.yaml up --abort-on-container-exit --exit-code-from integration-tester
 
       - name: Docker metadata for final image build
