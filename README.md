@@ -104,22 +104,28 @@ The project follows a standard Spring Boot application structure:
 - **`com.example.DemoToShowcaseSpringLdapApplication.java`**: The main Spring Boot application class.
 
 - **`com.example.config`**:
+
   - `LdapNameSerializer.java`: A Jackson serializer for `javax.naming.ldap.LdapName` objects, ensuring DNS are represented as strings in JSON responses.
 
 - **`com.example.controller`**:
+
   - `UserController.java`: A REST controller that exposes HTTP endpoints for user management (e.g., `/users`, `/users/{uid}`). It handles incoming requests, interacts with the `UserService`, and returns responses. DTOs are used for request and response payloads.
 
 - **`com.example.dto`**:
+
   - `UserDTO.java`: Data Transfer Object used to carry user data between the controller and clients. This helps decouple the API representation from the internal entity structure. **Note:** In a production system, password fields should not be included in DTOs sent to the client.
 
 - **`com.example.entity`**:
+
   - `User.java`: An LDAP entity class mapped to user entries in the directory. It uses Spring LDAP ODM (Object Directory Mapping) annotations (`@Entry`, `@Id`, `@Attribute`, `@DnAttribute`) to define how Java objects correspond to LDAP entries and their attributes.
     - `@Entry(base = "ou=groups", objectClasses = { ... })\`: Specifies the base OU for these entries and their LDAP object classes.
 
 - **`com.example.exception`**:
+
   - `GlobalExceptionHandler.java`: Uses `@RestControllerAdvice` to provide centralized exception handling for the application, converting specific LDAP exceptions and others into appropriate HTTP responses.
 
 - **`com.example.repository`**:
+
   - `UserRepository.java`: A Spring Data LDAP repository interface extending `LdapRepository`. It provides standard CRUD methods and allows defining custom query methods (e.g., `findByUid`, `findBySn`).
   - `UserRepositoryCustom.java`: An interface for custom repository methods that require more complex LDAP queries.
   - `impl/UserRepositoryImpl.java`: Implementation of `UserRepositoryCustom`, using `LdapTemplate` to construct and execute custom LDAP queries.

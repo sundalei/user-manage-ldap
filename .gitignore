@@ -34,3 +34,5 @@ build/
 .DS_Store
 /ldap-data/
 ldap_admin_password.txt
+
+report/
