@@ -72,12 +72,10 @@ jobs:
         with:
           image-ref: user-manage-ldap:${{ github.run_id }}
           exit-code: 0
-          ignore-unfixed: true
           vuln-type: os,library
           severity: HIGH,CRITICAL
           format: sarif
           output: trivy-results.sarif
-          skip-setup-trivy: true
           scanners: vuln
 
       # This new step directly checks the SARIF file for critical issues.
