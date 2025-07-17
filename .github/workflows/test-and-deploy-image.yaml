@@ -49,6 +49,10 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/arm64
 
+      - name: Debug Dependency Tree
+        run: |
+          docker run --rm --entrypoint mvn user-manage-ldap:${{ github.run_id }} dependency:tree -Dincludes=org.apache.maven:maven-core
+
       - name: Inspect image
         run: |
           docker image inspect user-manage-ldap:${{ github.run_id }}
