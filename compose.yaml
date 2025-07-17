@@ -1,13 +1,33 @@
 ---
 services:
   user-ldap:
-    image: sundalei/user-manage-ldap:pr-10
-    ports:
-      - "8080:8080"
+    image: "${TESTING_IMAGE}"
     environment:
       - LDAP_HOST=openldap-server
     depends_on:
       - openldap
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  integration-tester:
+    image: curlimages/curl:8.9.0
+    command:
+      [
+        "--retry",
+        "5",
+        "--retry-delay",
+        "5",
+        "--retry-connrefused",
+        "-f",
+        "http://user-ldap:8080/users",
+      ]
+    depends_on:
+      user-ldap:
+        condition: service_healthy
 
   openldap:
     image: osixia/openldap:1.5.0

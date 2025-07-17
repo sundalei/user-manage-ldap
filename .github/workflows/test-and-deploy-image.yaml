@@ -38,7 +38,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and export to Docker
+      - name: Build and export to Docker for Unit Tests
         uses: docker/build-push-action@v6
         with:
           push: false
@@ -84,6 +84,21 @@ jobs:
         if: always()
         with:
           sarif_file: trivy-results.sarif
+
+      - name: Build and export to Docker for Integration Tests
+        uses: docker/build-push-action@v6
+        with:
+          push: false
+          load: true # Export to Docker Engine rather than pushing to registry
+          tags: ${{ github.run_id }}:integration-test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/arm64
+
+      - name: Run Integration Tests
+        run: |
+          export TESTING_IMAGE=${{ github.run_id }}:integration-test
+          docker compose -f compose.yaml up --abort-on-container-exit --exit-code-from integration-tester
 
       - name: Docker metadata for final image build
         id: docker_meta
