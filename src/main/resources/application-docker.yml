@@ -1,3 +1,4 @@
+---
 spring:
   ldap:
     urls: ldap://ldap:389
