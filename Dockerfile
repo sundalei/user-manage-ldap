@@ -16,6 +16,8 @@ USER springuser
 WORKDIR /app
 ARG JAR_FILE=target/*.jar
 COPY --from=package --chown=springuser:spring /app/${JAR_FILE} app.jar
+# Activate the 'docker' profile
+ENV SPRING_PROFILES_ACTIVE=docker
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
