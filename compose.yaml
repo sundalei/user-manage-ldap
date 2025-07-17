@@ -51,9 +51,8 @@ services:
           -b dc=springframework,dc=org \
           -s base \
           -D cn=admin,dc=springframework,dc=org \
-          -w "${LDAP_ADMIN_PASSWORD}" 
+          -w "${LDAP_ADMIN_PASSWORD}"
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 20s
-
