@@ -51,7 +51,8 @@ jobs:
 
       - name: Debug Dependency Tree
         run: |
-          docker run --rm --entrypoint mvn user-manage-ldap:${{ github.run_id }} dependency:tree -Dincludes=org.apache.maven:maven-core
+          echo "Searching for maven-core jars inside the container's .m2 repository..."
+          docker run --rm --entrypoint /bin/sh user-manage-ldap:${{ github.run_id }} -c "find /root/.m2 -name '*maven-core*.jar'"
 
       - name: Inspect image
         run: |
