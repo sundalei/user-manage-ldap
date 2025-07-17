@@ -1,4 +1,4 @@
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+FROM maven:3.9.10-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline
@@ -18,6 +18,7 @@ ARG JAR_FILE=target/*.jar
 COPY --from=package --chown=springuser:spring /app/${JAR_FILE} app.jar
 # Activate the 'docker' profile
 ENV SPRING_PROFILES_ACTIVE=docker
+ENV LDAP_HOST=ldap
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1

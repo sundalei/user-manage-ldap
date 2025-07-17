@@ -42,35 +42,26 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: false
-          load: true
-          tags: user-manage-ldap:${{ github.run_id }}
+          load: true # Export to Docker Engine rather than pushing to registry
+          tags: ${{ github.run_id }}
           target: test
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/arm64
 
-      - name: Debug Dependency Tree
-        run: |
-          echo "Resolving plugin dependencies to find the source of the vulnerability..."
-          docker run --rm --entrypoint mvn user-manage-ldap:${{ github.run_id }} dependency:resolve-plugins
-
-      - name: Inspect image
-        run: |
-          docker image inspect user-manage-ldap:${{ github.run_id }}
-
       - name: Run Trivy for all CVEs (non-blocking)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.32.0
         with:
-          image-ref: user-manage-ldap:${{ github.run_id }}
+          image-ref: ${{ github.run_id }}
           format: table
           exit-code: 0
 
       # This step generates the SARIF report with both HIGH and CRITICAL vulnerabilities
       # but does not block the workflow.
       - name: Run Trivy for HIGH and CRITICAL CVEs and generate report
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.32.0
         with:
-          image-ref: user-manage-ldap:${{ github.run_id }}
+          image-ref: ${{ github.run_id }}
           exit-code: 0
           vuln-type: os,library
           severity: HIGH,CRITICAL
