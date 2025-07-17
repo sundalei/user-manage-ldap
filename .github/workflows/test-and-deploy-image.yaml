@@ -10,13 +10,22 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  security-events: write
 
 jobs:
   build-image:
     name: Build image
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      pull-requests: write
+      security-events: write
+
     steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -32,12 +41,18 @@ jobs:
       - name: Build and export to Docker
         uses: docker/build-push-action@v6
         with:
+          push: false
           load: true
           tags: user-manage-ldap:${{ github.run_id }}
           target: test
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/arm64
+
+      - name: Debug Dependency Tree
+        run: |
+          echo "Resolving plugin dependencies to find the source of the vulnerability..."
+          docker run --rm --entrypoint mvn user-manage-ldap:${{ github.run_id }} dependency:resolve-plugins
 
       - name: Inspect image
         run: |
@@ -49,6 +64,35 @@ jobs:
           image-ref: user-manage-ldap:${{ github.run_id }}
           format: table
           exit-code: 0
+
+      # This step generates the SARIF report with both HIGH and CRITICAL vulnerabilities
+      # but does not block the workflow.
+      - name: Run Trivy for HIGH and CRITICAL CVEs and generate report
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: user-manage-ldap:${{ github.run_id }}
+          exit-code: 0
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          format: sarif
+          output: trivy-results.sarif
+          scanners: vuln
+
+      # This new step directly checks the SARIF file for critical issues.
+      - name: Check for CRITICAL vulnerabilities in SARIF report
+        run: |
+          if grep -q '"level": "critical"' trivy-results.sarif; then
+            echo "CRITICAL vulnerabilities found in trivy-results.sarif. Failing the build."
+            exit 1
+          else
+            echo "No CRITICAL vulnerabilities found. Build can continue."
+          fi
+
+      - name: Upload Trivy scan results to Github Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
 
       - name: Docker metadata for final image build
         id: docker_meta

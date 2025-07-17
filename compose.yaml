@@ -1,5 +1,14 @@
 ---
 services:
+  user-ldap:
+    image: sundalei/user-manage-ldap:pr-10
+    ports:
+      - "8080:8080"
+    environment:
+      - LDAP_HOST=openldap-server
+    depends_on:
+      - openldap
+
   openldap:
     image: osixia/openldap:1.5.0
     container_name: openldap-server

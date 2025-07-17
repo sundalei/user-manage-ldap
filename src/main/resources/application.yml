@@ -4,7 +4,7 @@ spring:
     name: user-management-ldap
 
   ldap:
-    urls: ldap://localhost:389
+    urls: ldap://${LDAP_HOST:localhost}:389
     base: dc=springframework,dc=org
     username: cn=admin,dc=springframework,dc=org
     password: password

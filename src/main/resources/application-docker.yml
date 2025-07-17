@@ -1,0 +1,4 @@
+---
+spring:
+  ldap:
+    urls: ldap://${LDAP_HOST:ldap}:389
