@@ -59,7 +59,7 @@ jobs:
         with:
           image-ref: ${{ github.run_id }}
           format: sarif
-          exit-code: 0
+          exit-code: 1
           vuln-type: os,library
           severity: CRITICAL
           output: trivy-results.sarif
@@ -70,6 +70,13 @@ jobs:
         if: always()
         with:
           sarif_file: trivy-results.sarif
+
+      - name: Upload Trivy scan results as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-results
+          path: trivy-results.sarif
 
       - name: Build and push to ghcr for smoke test
         uses: docker/build-push-action@v6
