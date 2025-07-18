@@ -22,7 +22,7 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
             - name: LDAP_HOST
-              value: ldap
+              value: openldap-service
       imagePullSecrets:
         - name: regcred
 ---
