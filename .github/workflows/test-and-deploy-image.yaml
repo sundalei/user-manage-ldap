@@ -151,7 +151,12 @@ jobs:
           echo "--- Fetching logs from running user-manage-ldap pod ---"
           kubectl logs deployment/user-manage-ldap --tail=100 || echo "Fetching logs failed, continuing..."
 
-          # 6. Run the smoke test with verbose output from curl.
+          # 6. Test connectivity from INSIDE the pod to confirm localhost binding issue.
+          # If this succeeds while the next step fails, the app is bound to localhost.
+          echo "--- Running internal curl test inside the application pod ---"
+          kubectl exec $POD_NAME -- curl --fail -v http://localhost:8080/users || echo "Internal curl failed."
+
+          # 7. Run the smoke test with verbose output from curl.
           echo "--- Running smoke test with verbose curl... ---"
           kubectl run curl-tester --image=curlimages/curl:8.9.0 -i --rm --restart=Never -- curl --fail -v http://user-manage-ldap:8080/users
 
