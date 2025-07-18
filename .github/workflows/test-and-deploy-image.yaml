@@ -126,7 +126,26 @@ jobs:
           exit 1; \
           )
 
-          kubectl run curl-tester --image=curlimages/curl:8.9.0 -i --rm --restart=Never -- curl --fail http://user-manage-ldap:8080/users
+          # --- ENHANCED DEBUGGING STEPS ---
+          # Even if the rollout succeeds, we need more information.
+          echo "--- Deployment successful. Gathering diagnostics before test... ---"
+
+          # 1. Describe the service to verify port mapping and selector.
+          echo "--- Describing user-manage-ldap service ---"
+          kubectl describe svc user-manage-ldap
+
+          # 2. Check the service's endpoints to ensure it's connected to the pod.
+          # If the <none> is shown in the ENDPOINTS column, the service selector is wrong.
+          echo "--- Getting user-manage-ldap endpoints ---"
+          kubectl get endpoints user-manage-ldap
+
+          # 3. Print the application logs to see what it's doing post-startup.
+          echo "--- Fetching logs from running user-manage-ldap pod ---"
+          kubectl logs deployment/user-manage-ldap --tail=100
+
+          # 4. Run the smoke test with verbose output from curl.
+          echo "--- Running smoke test with verbose curl... ---"
+          kubectl run curl-tester --image=curlimages/curl:8.9.0 -i --rm --restart=Never -- curl --fail -v http://user-manage-ldap:8080/users
 
       - name: Docker metadata for final image build
         id: docker_meta
