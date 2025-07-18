@@ -119,7 +119,13 @@ jobs:
           export TESTING_IMAGE=ghcr.io/sundalei/${{ github.run_id }}:integration-test
           envsubst < manifests/deployment.yaml  | kubectl apply -f -
 
-          kubectl rollout status deployment user-manage-ldap
+          echo "Waiting for user-manage-ldap deployment..."
+          kubectl rollout status deployment user-manage-ldap --timeout=2m || ( \
+          echo "--- Deployment failed. Fetching logs for debugging... ---"; \
+          kubectl logs deployment/user-manage-ldap --tail=100; \
+          exit 1; \
+          )
+
           kubectl run curl-tester --image=curlimages/curl:8.9.0 -i --rm --restart=Never -- curl --fail http://user-manage-ldap:8080/users
 
       - name: Docker metadata for final image build
