@@ -111,20 +111,6 @@ jobs:
 
           echo "Pausing for 25 seconds to allow pods to start..."
           sleep 25
-          echo "--- Checking deployment status ---"
-          kubectl get deployment openldap-server
-          echo "--- Checking pod status ---"
-          kubectl get pods -l app=openldap-server -o wide
-          echo "--- Describing pods (to see events) ---"
-          
-          POD_NAME=$(kubectl get pods -l app=openldap-server -o jsonpath='{.items[0].metadata.name}')
-          if [ -n "$POD_NAME" ]; then
-            kubectl describe pod $POD_NAME
-            echo "--- Getting pod logs ---"
-            kubectl logs $POD_NAME
-          else
-            echo "No pods found for openldap-server."
-          fi
 
           kubectl rollout status deployment openldap-server
 
@@ -138,21 +124,9 @@ jobs:
 
           echo "Pausing for 25 seconds to allow pods to start..."
           sleep 25
-          echo "--- Checking deployment status ---"
-          kubectl get deployment user-manage-ldap
-          echo "--- Checking pod status ---"
-          kubectl get pods -l app=user-manage-ldap -o wide
-          echo "--- Describing pods (to see events) ---"
-          POD_NAME=$(kubectl get pods -l app=user-manage-ldap -o jsonpath='{.items[0].metadata.name}')
-          if [ -n "$POD_NAME" ]; then
-            kubectl describe pod $POD_NAME
-            echo "--- Getting pod logs ---"
-            kubectl logs $POD_NAME
-          else
-            echo "No pods found for user-manage-ldap."
-          fi
+
           kubectl rollout status deployment user-manage-ldap
-          kubectl exec deploy/user-manage-ldap -- curl --fail http://localhost:8080/users
+          kubectl run curl-tester --image=curlimages/curl:8.9.0 -i --rm --restart=Never -- curl --fail http://user-manage-ldap:8080/users
 
       - name: Docker metadata for final image build
         id: docker_meta
