@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openldap-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openldap-server
+  template:
+    metadata:
+      labels:
+        app: openldap-server
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-cred
+      containers:
+        - name: openldap
+          image: osixia/openldap:1.5.0
+          ports:
+            - containerPort: 389
+            - containerPort: 636
+          env:
+            - name: LDAP_ORGANISATION
+              value: "SpringFramework Org"
+            - name: LDAP_DOMAIN
+              value: "springframework.org"
+            - name: LDAP_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ldap-secret
+                  key: password
+          args:
+            - "--copy-service"
+            - "--loglevel"
+            - "debug"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openldap-service
+spec:
+  selector:
+    app: openldap-server
+  ports:
+    - protocol: TCP
+      port: 389
+      targetPort: 389
