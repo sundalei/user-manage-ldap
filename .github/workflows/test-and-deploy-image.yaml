@@ -43,7 +43,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and export to Docker for Unit Tests
+      - name: Build and export to Docker for CVEs check
         uses: docker/build-push-action@v6
         with:
           push: false
@@ -54,35 +54,16 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/arm64
 
-      - name: Run Trivy for all CVEs (non-blocking)
+      - name: Run Trivy for HIGH and CRITICAL CVEs
         uses: aquasecurity/trivy-action@0.32.0
         with:
           image-ref: ${{ github.run_id }}
-          format: table
-          exit-code: 0
-
-      # This step generates the SARIF report with both HIGH and CRITICAL vulnerabilities
-      # but does not block the workflow.
-      - name: Run Trivy for HIGH and CRITICAL CVEs and generate report
-        uses: aquasecurity/trivy-action@0.32.0
-        with:
-          image-ref: ${{ github.run_id }}
-          exit-code: 0
+          format: sarif
+          exit-code: 1
           vuln-type: os,library
           severity: HIGH,CRITICAL
-          format: sarif
           output: trivy-results.sarif
           scanners: vuln
-
-      # This new step directly checks the SARIF file for critical issues.
-      - name: Check for CRITICAL vulnerabilities in SARIF report
-        run: |
-          if grep -q '"level": "critical"' trivy-results.sarif; then
-            echo "CRITICAL vulnerabilities found in trivy-results.sarif. Failing the build."
-            exit 1
-          else
-            echo "No CRITICAL vulnerabilities found. Build can continue."
-          fi
 
       - name: Upload Trivy scan results to Github Security tab
         uses: github/codeql-action/upload-sarif@v3
@@ -90,19 +71,18 @@ jobs:
         with:
           sarif_file: trivy-results.sarif
 
-      - name: Build and export to Docker for Integration Tests
+      - name: Build and push to ghcr for smoke test
         uses: docker/build-push-action@v6
         with:
-          push: false
-          load: true # Export to Docker Engine rather than pushing to registry
-          tags: ${{ github.run_id }}:integration-test
+          push: true
+          tags: ghcr.io/sundalei/${{ github.run_id }}:integration-test
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/arm64
 
       - name: Run Integration Tests
         run: |
-          export TESTING_IMAGE=${{ github.run_id }}:integration-test
+          export TESTING_IMAGE=ghcr.io/sundalei/${{ github.run_id }}:integration-test
           export LDAP_ADMIN_PASSWORD=${{ secrets.LDAP_ADMIN_PASSWORD }}
           docker compose -f compose.yaml up --abort-on-container-exit --exit-code-from integration-tester
 
@@ -115,7 +95,6 @@ jobs:
             latest=false
           tags: |
             type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-            type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
 
