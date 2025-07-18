@@ -99,65 +99,50 @@ jobs:
 
       - name: Smoke test deployment in k3d Kubernetes
         run: |
-
+          
+          # Create secrets and deploy OpenLDAP
           kubectl create secret generic ldap-secret --from-literal=password=${{ secrets.LDAP_ADMIN_PASSWORD }}
-
           kubectl create secret docker-registry dockerhub-cred \
             --docker-server=https://index.docker.io/v1/ \
             --docker-username=${{ secrets.DOCKERHUB_USERNAME }} \
             --docker-password=${{ secrets.DOCKERHUB_TOKEN }}
-
+          
           kubectl apply -f manifests/ldap-deployment.yaml
+          
+          echo "Waiting for OpenLDAP server to be ready..."
+          kubectl rollout status deployment openldap-server --timeout=2m
 
-          kubectl rollout status deployment openldap-server
-
+          # Create secret and deploy the user-manage-ldap application
           kubectl create secret docker-registry regcred \
             --docker-server=https://ghcr.io \
             --docker-username=${{ github.actor }} \
             --docker-password=${{ secrets.GITHUB_TOKEN }}
-
+          
           export TESTING_IMAGE=ghcr.io/sundalei/${{ github.run_id }}:integration-test
           envsubst < manifests/deployment.yaml  | kubectl apply -f -
 
-          echo "Waiting for user-manage-ldap deployment..."
-          kubectl rollout status deployment user-manage-ldap --timeout=2m || ( \
-          echo "--- Deployment failed. Fetching logs for debugging... ---"; \
-          kubectl logs deployment/user-manage-ldap --tail=100; \
-          exit 1; \
-          )
+          # --- FINAL DEBUGGING STEP ---
+          # The rollout status can be misleading if the pod crashes after starting.
+          # We will wait for 30 seconds to allow the pod to enter a crash loop,
+          # then check its true status and logs.
+          echo "Waiting 30 seconds for pod to stabilize or enter a crash loop..."
+          sleep 30
 
-          # --- ENHANCED DEBUGGING STEPS ---
-          # Even if the rollout succeeds, we need more information.
-          echo "--- Deployment successful. Gathering diagnostics before test... ---"
-
-          # 1. Get status of all pods to see if they are running.
-          echo "--- Getting status of all pods ---"
+          echo "--- Checking final pod status after waiting ---"
           kubectl get pods -o wide
 
-          # 2. Describe the pod to check its event history for crashes or other issues.
-          echo "--- Describing user-manage-ldap pod to check for events ---"
+          echo "--- Describing pod to find crash events ---"
+          # This will now show restart counts and events like 'Back-off restarting failed container'
           POD_NAME=$(kubectl get pods -l app=user-manage-ldap -o jsonpath='{.items[0].metadata.name}')
           kubectl describe pod $POD_NAME
 
-          # 3. Describe the service to verify port mapping and selector.
-          echo "--- Describing user-manage-ldap service ---"
-          kubectl describe svc user-manage-ldap
+          echo "--- Fetching logs from previous, crashed container instance ---"
+          # The --previous flag gets logs from a container that has crashed and been restarted.
+          # This is where we will find the startup error message.
+          kubectl logs deployment/user-manage-ldap --previous
 
-          # 4. Check the service's endpoints to ensure it's connected to the pod.
-          echo "--- Getting user-manage-ldap endpoints ---"
-          kubectl get endpoints user-manage-ldap
-
-          # 5. Print the application logs. If it fails, print a message and continue.
-          echo "--- Fetching logs from running user-manage-ldap pod ---"
-          kubectl logs deployment/user-manage-ldap --tail=100 || echo "Fetching logs failed, continuing..."
-
-          # 6. Test connectivity from INSIDE the pod to confirm localhost binding issue.
-          # If this succeeds while the next step fails, the app is bound to localhost.
-          echo "--- Running internal curl test inside the application pod ---"
-          kubectl exec $POD_NAME -- curl --fail -v http://localhost:8080/users || echo "Internal curl failed."
-
-          # 7. Run the smoke test with verbose output from curl.
-          echo "--- Running smoke test with verbose curl... ---"
+          # The test below is expected to fail, but the logs above will tell us why.
+          echo "--- Running final smoke test ---"
           kubectl run curl-tester --image=curlimages/curl:8.9.0 -i --rm --restart=Never -- curl --fail -v http://user-manage-ldap:8080/users
 
       - name: Docker metadata for final image build
