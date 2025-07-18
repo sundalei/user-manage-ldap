@@ -134,20 +134,24 @@ jobs:
           echo "--- Getting status of all pods ---"
           kubectl get pods -o wide
 
-          # 2. Describe the service to verify port mapping and selector.
+          # 2. Describe the pod to check its event history for crashes or other issues.
+          echo "--- Describing user-manage-ldap pod to check for events ---"
+          POD_NAME=$(kubectl get pods -l app=user-manage-ldap -o jsonpath='{.items[0].metadata.name}')
+          kubectl describe pod $POD_NAME
+
+          # 3. Describe the service to verify port mapping and selector.
           echo "--- Describing user-manage-ldap service ---"
           kubectl describe svc user-manage-ldap
 
-          # 3. Check the service's endpoints to ensure it's connected to the pod.
-          # If the <none> is shown in the ENDPOINTS column, the service selector is wrong.
+          # 4. Check the service's endpoints to ensure it's connected to the pod.
           echo "--- Getting user-manage-ldap endpoints ---"
           kubectl get endpoints user-manage-ldap
 
-          # 4. Print the application logs to see what it's doing post-startup.
+          # 5. Print the application logs. If it fails, print a message and continue.
           echo "--- Fetching logs from running user-manage-ldap pod ---"
-          kubectl logs deployment/user-manage-ldap --tail=100
+          kubectl logs deployment/user-manage-ldap --tail=100 || echo "Fetching logs failed, continuing..."
 
-          # 5. Run the smoke test with verbose output from curl.
+          # 6. Run the smoke test with verbose output from curl.
           echo "--- Running smoke test with verbose curl... ---"
           kubectl run curl-tester --image=curlimages/curl:8.9.0 -i --rm --restart=Never -- curl --fail -v http://user-manage-ldap:8080/users
 
