@@ -64,6 +64,7 @@ jobs:
           severity: CRITICAL
           output: trivy-results.sarif
           scanners: vuln
+          limit-severities-for-sarif: true
 
       - name: Upload Trivy scan results to Github Security tab
         uses: github/codeql-action/upload-sarif@v3
