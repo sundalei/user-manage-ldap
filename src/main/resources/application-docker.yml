@@ -1,4 +1,7 @@
 ---
+
 spring:
   ldap:
     urls: ldap://${LDAP_HOST:ldap}:389
+server:
+  address: 0.0.0.0
