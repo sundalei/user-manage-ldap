@@ -128,7 +128,7 @@ jobs:
           echo "--- Describing pod to find crash events ---"
           # This will now show restart counts and events like 'Back-off restarting failed container'
           POD_NAME=$(kubectl get pods -l app=user-manage-ldap -o jsonpath='{.items[0].metadata.name}')
-          kubectl describe pod $POD_NAME
+          kubectl describe pod "$POD_NAME"
 
           echo "--- Running final smoke test ---"
           kubectl run curl-tester --image=bretfisher/netshoot -i --rm --restart=Never -- curl --fail -v http://user-manage-ldap:8080/users
