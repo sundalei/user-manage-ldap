@@ -99,14 +99,32 @@ jobs:
 
       - name: Smoke test deployment in k3d Kubernetes
         run: |
-          kubectl create secret generic ldap-secret --from-literal=password="${{ secrets.LDAP_ADMIN_PASSWORD }}"
+
+          kubectl create secret generic ldap-secret --from-literal=password=${{ secrets.LDAP_ADMIN_PASSWORD }}
 
           kubectl create secret docker-registry dockerhub-cred \
             --docker-server=https://index.docker.io/v1/ \
             --docker-username=${{ secrets.DOCKERHUB_USERNAME }} \
             --docker-password=${{ secrets.DOCKERHUB_TOKEN }}
+
           kubectl apply -f manifests/ldap-deployment.yaml
 
+          echo "Pausing for 25 seconds to allow pods to start..."
+          sleep 25
+          echo "--- Checking deployment status ---"
+          kubectl get deployment openldap-server
+          echo "--- Checking pod status ---"
+          kubectl get pods -l app=openldap-server -o wide
+          echo "--- Describing pods (to see events) ---"
+          
+          POD_NAME=$(kubectl get pods -l app=openldap-server -o jsonpath='{.items[0].metadata.name}')
+          if [ -n "$POD_NAME" ]; then
+            kubectl describe pod $POD_NAME
+            echo "--- Getting pod logs ---"
+            kubectl logs $POD_NAME
+          else
+            echo "No pods found for openldap-server."
+          fi
 
           kubectl rollout status deployment openldap-server
 
@@ -114,6 +132,7 @@ jobs:
             --docker-server=https://ghcr.io \
             --docker-username=${{ github.actor }} \
             --docker-password=${{ secrets.GITHUB_TOKEN }}
+
           export TESTING_IMAGE=ghcr.io/sundalei/${{ github.run_id }}:integration-test
           envsubst < manifests/deployment.yaml  | kubectl apply -f -
 
@@ -130,7 +149,7 @@ jobs:
             echo "--- Getting pod logs ---"
             kubectl logs $POD_NAME
           else
-            echo "No pods found for openldap-server."
+            echo "No pods found for user-manage-ldap."
           fi
           kubectl rollout status deployment user-manage-ldap
           kubectl exec deploy/user-manage-ldap -- curl --fail http://localhost:8080/users
