@@ -105,6 +105,22 @@ jobs:
             --docker-username=${{ secrets.DOCKERHUB_USERNAME }} \
             --docker-password=${{ secrets.DOCKERHUB_TOKEN }}
           kubectl apply -f manifests/ldap-deployment.yaml
+
+          echo "Pausing for 15 seconds to allow pods to start..."
+          sleep 25
+          echo "--- Checking deployment status ---"
+          kubectl get deployment openldap-server
+          echo "--- Checking pod status ---"
+          kubectl get pods -l app=openldap-server -o wide
+          echo "--- Describing pods (to see events) ---"
+          POD_NAME=$(kubectl get pods -l app=openldap-server -o jsonpath='{.items[0].metadata.name}')
+          if [ -n "$POD_NAME" ]; then
+            kubectl describe pod $POD_NAME
+            echo "--- Getting pod logs ---"
+            kubectl logs $POD_NAME
+          else
+            echo "No pods found for openldap-server."
+          fi
           kubectl rollout status deployment openldap-server
 
           kubectl create secret docker-registry regcred \
