@@ -52,7 +52,6 @@ jobs:
           target: test
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/arm64
 
       - name: Run Trivy for HIGH and CRITICAL CVEs
         uses: aquasecurity/trivy-action@0.32.0
@@ -64,6 +63,9 @@ jobs:
           severity: CRITICAL
           output: trivy-results.sarif
           scanners: vuln
+          # CRITICAL: This flag is REQUIRED to make the exit code respect the 'severity' setting.
+          # Without it, the step fails on ANY vulnerability when using SARIF format due to a known
+          # issue in the action (aquasecurity/trivy-action#386). Do not remove.
           limit-severities-for-sarif: true
 
       - name: Upload Trivy scan results to Github Security tab
@@ -72,13 +74,6 @@ jobs:
         with:
           sarif_file: trivy-results.sarif
 
-      - name: Upload Trivy scan results as artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-results
-          path: trivy-results.sarif
-
       - name: Build and push to ghcr for smoke test
         uses: docker/build-push-action@v6
         with:
@@ -86,7 +81,6 @@ jobs:
           tags: ghcr.io/sundalei/${{ github.run_id }}:integration-test
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/arm64
 
       - name: Run Integration Tests
         run: |
