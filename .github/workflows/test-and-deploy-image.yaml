@@ -88,6 +88,30 @@ jobs:
           export LDAP_ADMIN_PASSWORD=${{ secrets.LDAP_ADMIN_PASSWORD }}
           docker compose -f compose.yaml up --abort-on-container-exit --exit-code-from integration-tester
 
+      - name: Create k3d cluster
+        uses: AbsaOSS/k3d-action@v2
+        with:
+          cluster-name: "test-cluster-1"
+          args: >-
+            --agents 1
+            --no-lb
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+
+      - name: Smoke test deployment in k3d Kubernetes
+        run: |
+          kubectl create secret generic ldap-secret --from-literal=password=${{ secrets.LDAP_ADMIN_PASSWORD }}
+          kubectl apply -f manifests/ldap-deployment.yaml
+          kubectl rollout status deployment openldap-server
+
+          kubectl create secret docker-registry regcred \
+            --docker-server=https://ghcr.io \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.GITHUB_TOKEN }}
+          export TESTING_IMAGE=ghcr.io/sundalei/${{ github.run_id }}:integration-test
+          envsubst < manifests/deployment.yaml  | kubectl apply -f -
+          kubectl rollout status deployment user-manage-ldap
+          kubectl exec deploy/user-manage-ldap -- curl --fail http://localhost:8080/actuator/health
+
       - name: Docker metadata for final image build
         id: docker_meta
         uses: docker/metadata-action@v5
