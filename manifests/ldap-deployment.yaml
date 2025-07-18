@@ -31,7 +31,7 @@ spec:
                 secretKeyRef:
                   name: ldap-secret
                   key: password
-          command:
+          args:
             - "--copy-service"
             - "--loglevel"
             - "debug"

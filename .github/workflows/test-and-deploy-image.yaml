@@ -99,7 +99,8 @@ jobs:
 
       - name: Smoke test deployment in k3d Kubernetes
         run: |
-          kubectl create secret generic ldap-secret --from-literal=password=${{ secrets.LDAP_ADMIN_PASSWORD }}
+          kubectl create secret generic ldap-secret --from-literal=password="${{ secrets.LDAP_ADMIN_PASSWORD }}"
+
           kubectl create secret docker-registry dockerhub-cred \
             --docker-server=https://index.docker.io/v1/ \
             --docker-username=${{ secrets.DOCKERHUB_USERNAME }} \
