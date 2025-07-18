@@ -109,9 +109,6 @@ jobs:
 
           kubectl apply -f manifests/ldap-deployment.yaml
 
-          echo "Pausing for 25 seconds to allow pods to start..."
-          sleep 25
-
           kubectl rollout status deployment openldap-server
 
           kubectl create secret docker-registry regcred \
@@ -121,9 +118,6 @@ jobs:
 
           export TESTING_IMAGE=ghcr.io/sundalei/${{ github.run_id }}:integration-test
           envsubst < manifests/deployment.yaml  | kubectl apply -f -
-
-          echo "Pausing for 25 seconds to allow pods to start..."
-          sleep 25
 
           kubectl rollout status deployment user-manage-ldap
           kubectl run curl-tester --image=curlimages/curl:8.9.0 -i --rm --restart=Never -- curl --fail http://user-manage-ldap:8080/users
@@ -170,7 +164,6 @@ jobs:
             ```text
             ${{ steps.docker_meta.outputs.tags }}
             ```
-
             Labels added to images:
             ```text
             ${{ steps.docker_meta.outputs.labels }}
