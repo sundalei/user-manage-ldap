@@ -36,7 +36,7 @@ jobs:
         with:
           push: false
           load: true # Load the image into the local Docker daemon
-          tags: ${{ self.outputs.image_tag }}
+          tags: ${{ job.outputs.image_tag }}
           target: test
           cache-from: type=gha
           cache-to: type=gha,mode=max
