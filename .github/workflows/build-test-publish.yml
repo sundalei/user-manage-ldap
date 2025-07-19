@@ -65,3 +65,12 @@ jobs:
         if: always() # Ensure results are uploaded even if the scan fails
         with:
           sarif_file: trivy-results.sarif
+
+      - name: Save Docker image as an artifact
+        run: docker save ${{ steps.image_tag_generator.outputs.image_tag }} -o image.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-artifact
+          path: image.tar
