@@ -32,7 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 .DS_Store
-/ldap-data/
 ldap_admin_password.txt
 
 report/
