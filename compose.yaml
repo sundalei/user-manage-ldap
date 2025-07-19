@@ -36,7 +36,7 @@ services:
     volumes:
       - ./ldap-data/database:/var/lib/ldap
       - ./ldap-data/config:/etc/ldap/slapd.d
-      - ./ldap-data/import:/container/service/slapd/assets/custom-bootstrap/ldif
+      - ./ldap-data/import/users.ldif:/container/service/slapd/assets/config/bootstrap/ldif/users
     restart: unless-stopped
     healthcheck:
       test: |-
