@@ -15,17 +15,8 @@ services:
       start_period: 30s
 
   integration-tester:
-    image: curlimages/curl:8.9.0
-    command:
-      [
-        "--retry",
-        "5",
-        "--retry-delay",
-        "5",
-        "--retry-connrefused",
-        "-f",
-        "http://user-ldap:8080/users",
-      ]
+    image: bretfisher/netshoot:stable-20230820-cefc587
+    command: ["curl", "-f", "http://user-ldap:8080/users"]
     depends_on:
       user-ldap:
         condition: service_healthy
