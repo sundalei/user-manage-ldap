@@ -48,3 +48,15 @@ services:
       timeout: 10s
       retries: 5
       start_period: 20s
+
+  populate-sample-data:
+    image: alpine:latest
+    volumes:
+      - .:/app
+    command: >
+      sh -c "sleep 10 && 
+             docker cp /app/users.ldif openldap-server:/users.ldif &&
+             docker exec -it openldap-server ldapadd -x -D 'cn=admin,dc=springframework,dc=org' -w '${LDAP_ADMIN_PASSWORD}' -f /users.ldif"
+    depends_on:
+      openldap:
+        condition: service_started
