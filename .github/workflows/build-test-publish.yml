@@ -140,7 +140,7 @@ jobs:
           kubectl describe pod "$POD_NAME"
 
           echo "--- Running final smoke test ---"
-          kubectl run tester --image=bretfisher/netshoot -i --rm -- curl --fail -v http://user-manage-ldap:8080/users
+          kubectl run tester --image=bretfisher/netshoot --rm -- curl --fail -v http://user-manage-ldap:8080/users
 
   publish:
     name: Publish Final Image

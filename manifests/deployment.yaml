@@ -9,7 +9,7 @@ data:
     objectclass: top
     objectclass: organizationalUnit
     ou: groups
-    
+
     dn: uid=dbrown,ou=groups,dc=springframework,dc=org
     cn: David Brown
     objectclass: top
@@ -19,7 +19,7 @@ data:
     sn: Brown
     uid: dbrown
     userpassword: password5
-    
+
     dn: uid=john,ou=groups,dc=springframework,dc=org
     cn: John
     objectclass: top
@@ -29,7 +29,7 @@ data:
     sn: John
     uid: john
     userpassword: 12345
-    
+
     dn: uid=msmith,ou=groups,dc=springframework,dc=org
     cn: Mary Smith
     objectclass: top
@@ -39,7 +39,7 @@ data:
     sn: Smith
     uid: msmith
     userpassword: password2
-    
+
     dn: uid=pjones,ou=groups,dc=springframework,dc=org
     cn: Peter Jones
     objectclass: top
@@ -49,7 +49,7 @@ data:
     sn: Jones
     uid: pjones
     userpassword: password3
-    
+
     dn: uid=swilliams,ou=groups,dc=springframework,dc=org
     cn: Susan Williams
     objectclass: top
