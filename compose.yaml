@@ -32,10 +32,14 @@ services:
       - LDAP_ORGANISATION=SpringFramework Org
       - LDAP_DOMAIN=springframework.org
       - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
-    command: --copy-service --loglevel debug
+    command: >
+      sh -c "
+      --copy-service --loglevel debug &&
+      /bin/bash /scripts/populate_sample_data.sh
+      "
     volumes:
-      - ./ldap-data/database:/var/lib/ldap
-      - ./ldap-data/config:/etc/ldap/slapd.d
+      - ./users.ldif:/tmp/users.ldif
+      - ./populate_sample_data.sh:/scripts/populate_sample_data.sh
     restart: unless-stopped
     healthcheck:
       test: |-
