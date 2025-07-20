@@ -76,6 +76,16 @@ spec:
     spec:
       imagePullSecrets:
         - name: dockerhub-cred
+      initContainers:
+        - name: copy-bootstrap-ldif
+          image: busybox:1.35
+          command:
+            ["sh", "-c", "cp -L /configmap-input/* /bootstrap-ldif-staging/"]
+          volumeMounts:
+            - name: bootstrap-ldif-configmap
+              mountPath: /configmap-input
+            - name: bootstrap-ldif-staging
+              mountPath: /bootstrap-ldif-staging
       containers:
         - name: openldap
           image: osixia/openldap:1.5.0
@@ -93,16 +103,18 @@ spec:
                   name: ldap-secret
                   key: password
           volumeMounts:
-            - name: bootstrap-volume
+            - name: bootstrap-ldif-staging
               mountPath: /container/service/slapd/assets/config/bootstrap/ldif/custom
           args:
             - "--copy-service"
             - "--loglevel"
             - "debug"
       volumes:
-        - name: bootstrap-volume
+        - name: bootstrap-ldif-configmap
           configMap:
             name: openldap-bootstrap-ldif
+        - name: bootstrap-ldif-staging
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
