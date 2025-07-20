@@ -67,6 +67,10 @@ jobs:
     needs: build_and_scan
 
     steps:
+      - name: Set testing image environment variable
+        id: vars
+        run: echo "INTEGRATION_TESTING_IMAGE=ghcr.io/${{ github.repository_owner }}/${{ github.run_id }}:integration-test" >> "$GITHUB_OUTPUT"
+
       - name: Checkout git repo
         uses: actions/checkout@v4
 
@@ -84,15 +88,15 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ github.run_id }}:integration-test
+          tags: ${{ steps.vars.outputs.INTEGRATION_TESTING_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Run Integration Tests
         run: |
-          export TESTING_IMAGE=ghcr.io/${{ github.repository_owner }}/${{ github.run_id }}:integration-test
+          export TESTING_IMAGE=${{ steps.vars.outputs.INTEGRATION_TESTING_IMAGE }}
           export LDAP_ADMIN_PASSWORD=${{ secrets.LDAP_ADMIN_PASSWORD }}
-          docker compose -f compose.yaml up --abort-on-container-exit --exit-code-from integration-tester
+          docker compose -f manifests/compose.yaml up --abort-on-container-exit --exit-code-from integration-tester
 
       - name: Create k3d cluster
         uses: AbsaOSS/k3d-action@v2
@@ -125,7 +129,7 @@ jobs:
             --docker-username=${{ github.actor }} \
             --docker-password=${{ secrets.GITHUB_TOKEN }}
 
-          export TESTING_IMAGE=ghcr.io/sundalei/${{ github.run_id }}:integration-test
+          export TESTING_IMAGE=${{ steps.vars.outputs.INTEGRATION_TESTING_IMAGE }}
           envsubst < manifests/deployment.yaml  | kubectl apply -f -
 
           echo "Waiting for user-manage-ldap to be ready..."
@@ -133,11 +137,6 @@ jobs:
 
           echo "--- Checking final pod status after waiting ---"
           kubectl get pods -o wide
-
-          echo "--- Describing pod to find crash events ---"
-          # This will now show restart counts and events like 'Back-off restarting failed container'
-          POD_NAME=$(kubectl get pods -l app=user-manage-ldap -o jsonpath='{.items[0].metadata.name}')
-          kubectl describe pod "$POD_NAME"
 
           echo "--- Running final smoke test ---"
           kubectl run tester --image=bretfisher/netshoot -it --rm -- curl --fail -v http://user-manage-ldap:8080/users
