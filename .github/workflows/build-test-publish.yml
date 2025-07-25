@@ -126,7 +126,7 @@ jobs:
           kubectl apply -f manifests/ldap-deployment.yaml
 
           echo "Waiting for OpenLDAP server to be ready..."
-          kubectl rollout status deployment openldap-server --timeout=2m
+          kubectl rollout status deployment openldap-server --namespace test-ns --timeout=2m
 
           # Create secret and deploy the user-manage-ldap application
           kubectl create secret docker-registry regcred \
@@ -139,14 +139,14 @@ jobs:
           envsubst < manifests/deployment.yaml  | kubectl apply -f -
 
           echo "Waiting for user-manage-ldap to be ready..."
-          kubectl rollout status deployment user-manage-ldap --timeout=2m
+          kubectl rollout status deployment user-manage-ldap --namespace test-ns --timeout=2m
 
           echo "--- Checking final pod status after waiting ---"
           kubectl get pods -o wide -n test-ns
 
           echo "--- Running final smoke test ---"
-          kubectl run tester --image=bretfisher/netshoot -n test-ns -it --rm -- \
-            curl --fail -v http://user-manage-ldap:8080/users
+          kubectl run tester --image=bretfisher/netshoot -it --rm -- \
+            curl --fail -v http://user-manage-ldap.test-ns.svc.cluster.local:8080/users
 
   publish:
     name: Publish Final Image
