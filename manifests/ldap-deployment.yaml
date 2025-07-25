@@ -81,6 +81,10 @@ spec:
       initContainers:
         - name: copy-bootstrap-ldif
           image: busybox:1.35
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
           command:
             ["sh", "-c", "cp -L /configmap-input/* /bootstrap-ldif-staging/"]
           volumeMounts:
@@ -94,6 +98,10 @@ spec:
           ports:
             - containerPort: 389
             - containerPort: 636
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
           env:
             - name: LDAP_ORGANISATION
               value: "SpringFramework Org"
