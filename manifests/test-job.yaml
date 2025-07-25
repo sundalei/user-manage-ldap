@@ -10,6 +10,6 @@ spec:
       containers:
       - name: curl-tester
         image: bretfisher/netshoot
-        command: ["curl", "--fail", "-v", "http://user-manage-ldap.test-ns.svc.cluster.local:8080/users"]
+        command: ["curl", "--fail", "-v", "http://user-manage-ldap:8080/users"]
       restartPolicy: OnFailure
   backoffLimit: 2
