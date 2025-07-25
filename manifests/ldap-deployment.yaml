@@ -76,6 +76,9 @@ spec:
       labels:
         app: openldap-server
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       imagePullSecrets:
         - name: dockerhub-cred
       initContainers:
@@ -92,6 +95,10 @@ spec:
               mountPath: /configmap-input
             - name: bootstrap-ldif-staging
               mountPath: /bootstrap-ldif-staging
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
       containers:
         - name: openldap
           image: osixia/openldap:1.5.0
@@ -119,6 +126,10 @@ spec:
             - "--copy-service"
             - "--loglevel"
             - "debug"
+          securityContext:
+            capabilities:
+              drop:
+                - NET_RAW
       volumes:
         - name: bootstrap-ldif-configmap
           configMap:
