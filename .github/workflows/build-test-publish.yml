@@ -149,15 +149,15 @@ jobs:
           # which will then fail this entire workflow step.
           echo "Waiting for Job completion in namespace test-ns..."
           set +e
-          kubectl wait --for=condition=complete job/curl-smoke-test -n test-ns --timeout=2m
+          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=2m
           wait_status=$?
           set -e
 
           # Step 2: Always get the logs, regardless of success or failure.
           echo "--- Pod Logs ---"
-          POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -n test-ns -o jsonpath='{.items[0].metadata.name}')
+          POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
           if [ -n "$POD_NAME" ]; then
-            kubectl logs "$POD_NAME" -n test-ns
+            kubectl logs "$POD_NAME"
           else
             echo "Could not find pod for job to retrieve logs."
           fi
