@@ -1,0 +1,14 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: curl-smoke-test
+spec:
+  template:
+    spec:
+      containers:
+        - name: curl-tester
+          image: bretfisher/netshoot
+          command: ["curl", "--fail", "-v", "http://user-manage-ldap:8080/users"]
+      restartPolicy: OnFailure
+  backoffLimit: 2

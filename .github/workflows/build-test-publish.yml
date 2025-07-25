@@ -141,6 +141,28 @@ jobs:
           echo "--- Running final smoke test ---"
           kubectl run tester --image=bretfisher/netshoot -it --rm -- curl --fail -v http://user-manage-ldap:8080/users
 
+          echo "Applying the Kubernetes Job..."
+          kubectl apply -f manifests/test-job.yaml
+
+          # Step 2: Wait for the Job to complete.
+          # `kubectl wait` will automatically fail if the Job fails or times out,
+          # which will then fail this entire workflow step.
+          echo "Waiting for Job completion..."
+          if ! kubectl wait --for=condition=complete job/curl-smoke-test --timeout=2m; then
+            echo "Job failed or timed out."
+            
+            # Step 3: If the wait fails, get logs from the pod for debugging.
+            echo "--- Pod Logs from Failed Job ---"
+            POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
+            kubectl logs $POD_NAME
+            echo "--- End Logs ---"
+
+            # Step 4: Exit with a non-zero code to ensure the workflow fails.
+            exit 1
+          fi
+
+          echo "Job completed successfully!"
+
   publish:
     name: Publish Final Image
     runs-on: ubuntu-latest
