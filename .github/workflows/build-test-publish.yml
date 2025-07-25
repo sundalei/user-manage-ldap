@@ -145,35 +145,42 @@ jobs:
           kubectl get pods -o wide -n test-ns
 
           echo "--- Running final smoke test ---"
-          echo "Applying the Kubernetes Job..."
+          echo "Applying the Kubernetes Job from manifests/test-job.yaml..."
           kubectl apply -f manifests/test-job.yaml
 
-          # Step 1: Wait for the job to complete.
-          # We use `set +e` to prevent the script from exiting immediately if `kubectl wait` fails.
-          # We store its exit code in the 'wait_status' variable instead.
           echo "Waiting for Job completion in namespace test-ns..."
           set +e
           kubectl wait --for=condition=complete job/curl-smoke-test -n test-ns --timeout=2m
           wait_status=$?
           set -e
 
-          # Step 2: Always get the logs, regardless of success or failure.
-          echo "--- Pod Logs ---"
-          POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -n test-ns -o jsonpath='{.items[0].metadata.name}')
-          if [ -n "$POD_NAME" ]; then
-            kubectl logs "$POD_NAME" -n test-ns
-          else
-            echo "Could not find pod for job to retrieve logs."
-          fi
-          echo "--- End Logs ---"
-
-          # Step 3: Now, check if the wait command failed and exit if necessary.
+          # Check if the job failed or timed out
           if [ $wait_status -ne 0 ]; then
-            echo "Job failed or timed out."
+            echo "Job failed or timed out. Gathering debug information..."
+
+            # Add this command to get the Job events
+            echo "--- Job Events ---"
+            kubectl describe job curl-smoke-test -n test-ns
+            echo "--- End Job Events ---"
+
+            echo "--- Pod Logs ---"
+            POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -n test-ns -o jsonpath='{.items[0].metadata.name}')
+            if [ -n "$POD_NAME" ]; then
+              kubectl logs "$POD_NAME" -n test-ns
+            else
+              echo "Could not find pod for job to retrieve logs."
+            fi
+            echo "--- End Pod Logs ---"
+
             exit 1
           fi
 
-          echo "Job completed successfully!"
+          # This part runs only on success
+          echo "Job completed successfully! Getting logs..."
+          echo "--- Pod Logs ---"
+          POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -n test-ns -o jsonpath='{.items[0].metadata.name}')
+          kubectl logs "$POD_NAME" -n test-ns
+          echo "--- End Pod Logs ---"
 
       - name: Delete all in test namepspace
         if: always()
