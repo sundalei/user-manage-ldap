@@ -145,8 +145,43 @@ jobs:
           kubectl get pods -o wide -n test-ns
 
           echo "--- Running final smoke test ---"
-          kubectl run tester --image=bretfisher/netshoot -it --rm -- \
-            curl --fail -v http://user-manage-ldap.test-ns.svc.cluster.local:8080/users
+          echo "Applying the Kubernetes Job..."
+          kubectl apply -f manifests/test-job.yaml
+
+          # Step 1: Wait for the job to complete.
+          # We use `set +e` to prevent the script from exiting immediately if `kubectl wait` fails.
+          # We store its exit code in the 'wait_status' variable instead.
+          echo "Waiting for Job completion in namespace test-ns..."
+          set +e
+          kubectl wait --for=condition=complete job/curl-smoke-test -n test-ns --timeout=2m
+          wait_status=$?
+          set -e
+
+          # Step 2: Always get the logs, regardless of success or failure.
+          echo "--- Pod Logs ---"
+          POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -n test-ns -o jsonpath='{.items[0].metadata.name}')
+          if [ -n "$POD_NAME" ]; then
+            kubectl logs "$POD_NAME" -n test-ns
+          else
+            echo "Could not find pod for job to retrieve logs."
+          fi
+          echo "--- End Logs ---"
+
+          # Step 3: Now, check if the wait command failed and exit if necessary.
+          if [ $wait_status -ne 0 ]; then
+            echo "Job failed or timed out."
+            exit 1
+          fi
+
+          echo "Job completed successfully!"
+
+      - name: Delete all in test namepspace
+        if: always()
+        run: |
+          echo "Deleting all resources in test-ns namespace..."
+          kubectl delete all --all -n test-ns || true
+          kubectl delete secret --all -n test-ns || true
+          kubectl delete namespace test-ns || true
 
   publish:
     name: Publish Final Image
