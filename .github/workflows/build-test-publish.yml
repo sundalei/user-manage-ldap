@@ -164,6 +164,9 @@ jobs:
             kubectl describe job curl-smoke-test
             echo "--- End Job Events ---"
 
+            echo "--- Checking final pod status after waiting ---"
+            kubectl get pods -o wide
+
             echo "--- Pod Logs ---"
             POD_NAMES=$(kubectl get pods -n test -l app=user-manage-ldap -o jsonpath='{.items[*].metadata.name}')
             if [ -n "$POD_NAME" ]; then
