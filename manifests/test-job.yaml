@@ -3,6 +3,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: curl-smoke-test
+  namespace: test
 spec:
   template:
     spec:
@@ -12,4 +13,4 @@ spec:
           command:
             ["curl", "--fail", "-v", "http://user-manage-ldap:8080/users"]
       restartPolicy: OnFailure
-  backoffLimit: 2
+  backoffLimit: 0
