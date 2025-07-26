@@ -35,3 +35,6 @@ build/
 ldap_admin_password.txt
 
 report/
+node_modules/
+package-lock.json
+package.json
