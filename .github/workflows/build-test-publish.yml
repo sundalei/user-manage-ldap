@@ -110,7 +110,7 @@ jobs:
       - name: Smoke test deployment in k3d Kubernetes
         run: |
 
-          # Create test-ns namespace
+          # Create namespace named test
           kubectl apply -f manifests/namespace.yaml
 
           # Set the default namespace for all subsequent kubectl commands in this job
@@ -128,7 +128,7 @@ jobs:
           kubectl apply -f manifests/ldap-deployment.yaml
 
           echo "Waiting for OpenLDAP server to be ready..."
-          kubectl rollout status deployment openldap-server --namespace test-ns --timeout=2m
+          kubectl rollout status deployment openldap-server --timeout=2m
 
           # Create secret and deploy the user-manage-ldap application
           kubectl create secret docker-registry regcred \
@@ -149,7 +149,7 @@ jobs:
           echo "Applying the Kubernetes Job from manifests/test-job.yaml..."
           kubectl apply -f manifests/test-job.yaml
 
-          echo "Waiting for Job completion in namespace test-ns..."
+          echo "Waiting for Job completion ..."
           set +e
           kubectl wait --for=condition=complete job/curl-smoke-test --timeout=2m
           wait_status=$?
@@ -186,40 +186,10 @@ jobs:
       - name: Delete all in test namepspace
         if: always()
         run: |
-          echo "Deleting all resources in test-ns namespace..."
-          kubectl delete all --all -n test-ns || true
-          kubectl delete secret --all -n test-ns || true
-          kubectl delete namespace test-ns || true
-
-          echo "Applying the Kubernetes Job..."
-          kubectl apply -f manifests/test-job.yaml
-
-          # Step 2: Wait for the Job to complete.
-          # `kubectl wait` will automatically fail if the Job fails or times out,
-          # which will then fail this entire workflow step.
-          echo "Waiting for Job completion in namespace test-ns..."
-          set +e
-          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=2m
-          wait_status=$?
-          set -e
-
-          # Step 2: Always get the logs, regardless of success or failure.
-          echo "--- Pod Logs ---"
-          POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
-          if [ -n "$POD_NAME" ]; then
-            kubectl logs "$POD_NAME"
-          else
-            echo "Could not find pod for job to retrieve logs."
-          fi
-          echo "--- End Logs ---"
-
-          # Step 3: Now, check if the wait command failed and exit if necessary.
-          if [ $wait_status -ne 0 ]; then
-            echo "Job failed or timed out."
-            exit 1
-          fi
-
-          echo "Job completed successfully!"
+          echo "Deleting all resources"
+          kubectl delete all --all -n test || true
+          kubectl delete secret --all -n test || true
+          kubectl delete namespace test || true
 
   publish:
     name: Publish Final Image
