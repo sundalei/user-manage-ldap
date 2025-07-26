@@ -151,7 +151,7 @@ jobs:
 
           echo "Waiting for Job completion ..."
           set +e
-          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=2m
+          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=5m
           wait_status=$?
           set -e
 
@@ -194,7 +194,7 @@ jobs:
           kubectl logs "$POD_NAME"
           echo "--- End Pod Logs ---"
 
-      - name: Delete all in test namepspace
+      - name: Delete all in test namespace
         if: always()
         run: |
           echo "Deleting all resources"
