@@ -24,6 +24,8 @@ spec:
               memory: "512Mi"
               cpu: "500m"
           env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xmx350m"
             - name: SPRING_PROFILES_ACTIVE
               value: docker
             - name: LDAP_HOST
