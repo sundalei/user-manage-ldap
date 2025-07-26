@@ -109,19 +109,21 @@ jobs:
 
       - name: Smoke test deployment in k3d Kubernetes
         run: |
-          
+
           # Create test-ns namespace
           kubectl apply -f manifests/namespace.yaml
-          
+
+          # Set the default namespace for all subsequent kubectl commands in this job
+          kubectl config set-context --current --namespace=test
+
           # Create secrets and deploy OpenLDAP
-          kubectl create secret generic ldap-secret -n test-ns \
+          kubectl create secret generic ldap-secret \
             --from-literal=password=${{ secrets.LDAP_ADMIN_PASSWORD }}
 
           kubectl create secret docker-registry dockerhub-cred \
             --docker-server=https://index.docker.io/v1/ \
             --docker-username=${{ secrets.DOCKERHUB_USERNAME }} \
-            --docker-password=${{ secrets.DOCKERHUB_TOKEN }} \
-            -n test-ns
+            --docker-password=${{ secrets.DOCKERHUB_TOKEN }}
 
           kubectl apply -f manifests/ldap-deployment.yaml
 
@@ -132,17 +134,16 @@ jobs:
           kubectl create secret docker-registry regcred \
             --docker-server=https://ghcr.io \
             --docker-username=${{ github.actor }} \
-            --docker-password=${{ secrets.GITHUB_TOKEN }} \
-            -n test-ns
+            --docker-password=${{ secrets.GITHUB_TOKEN }}
 
           export TESTING_IMAGE=${{ steps.vars.outputs.INTEGRATION_TESTING_IMAGE }}
           envsubst < manifests/deployment.yaml  | kubectl apply -f -
 
           echo "Waiting for user-manage-ldap to be ready..."
-          kubectl rollout status deployment user-manage-ldap --namespace test-ns --timeout=2m
+          kubectl rollout status deployment user-manage-ldap --timeout=2m
 
           echo "--- Checking final pod status after waiting ---"
-          kubectl get pods -o wide -n test-ns
+          kubectl get pods -o wide
 
           echo "--- Running final smoke test ---"
           echo "Applying the Kubernetes Job from manifests/test-job.yaml..."
@@ -150,7 +151,7 @@ jobs:
 
           echo "Waiting for Job completion in namespace test-ns..."
           set +e
-          kubectl wait --for=condition=complete job/curl-smoke-test -n test-ns --timeout=2m
+          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=2m
           wait_status=$?
           set -e
 
@@ -160,13 +161,13 @@ jobs:
 
             # Add this command to get the Job events
             echo "--- Job Events ---"
-            kubectl describe job curl-smoke-test -n test-ns
+            kubectl describe job curl-smoke-test
             echo "--- End Job Events ---"
 
             echo "--- Pod Logs ---"
-            POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -n test-ns -o jsonpath='{.items[0].metadata.name}')
+            POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
             if [ -n "$POD_NAME" ]; then
-              kubectl logs "$POD_NAME" -n test-ns
+              kubectl logs "$POD_NAME"
             else
               echo "Could not find pod for job to retrieve logs."
             fi
@@ -178,8 +179,8 @@ jobs:
           # This part runs only on success
           echo "Job completed successfully! Getting logs..."
           echo "--- Pod Logs ---"
-          POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -n test-ns -o jsonpath='{.items[0].metadata.name}')
-          kubectl logs "$POD_NAME" -n test-ns
+          POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
+          kubectl logs "$POD_NAME"
           echo "--- End Pod Logs ---"
 
       - name: Delete all in test namepspace
