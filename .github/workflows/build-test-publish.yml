@@ -188,6 +188,7 @@ jobs:
 
           # This part runs only on success
           echo "Job completed successfully! Getting logs..."
+          kubectl get pods -o wide
           echo "--- Pod Logs ---"
           POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
           kubectl logs "$POD_NAME"
