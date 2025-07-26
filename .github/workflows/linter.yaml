@@ -36,4 +36,4 @@ jobs:
           JSCPD_FILE_NAME: .jscpd.json
           VALIDATE_NATURAL_LANGUAGE: false
           FIX_MARKDOWN_PRETTIER: true
-          VALIDATE_CHECKOV: false
+          LOG_LEVEL: DEBUG
