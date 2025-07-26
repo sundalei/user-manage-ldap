@@ -3,6 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: openldap-bootstrap-ldif
+  namespace: test
 data:
   users.ldif: |
     dn: ou=groups,dc=springframework,dc=org
@@ -64,6 +65,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: openldap-server
+  namespace: test
 spec:
   replicas: 1
   selector:
@@ -74,6 +76,9 @@ spec:
       labels:
         app: openldap-server
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       imagePullSecrets:
         - name: dockerhub-cred
       initContainers:
@@ -120,6 +125,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: openldap-service
+  namespace: test
 spec:
   selector:
     app: openldap-server
