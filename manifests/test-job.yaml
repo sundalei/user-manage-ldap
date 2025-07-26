@@ -18,4 +18,4 @@ spec:
               "http://user-manage-ldap.test.svc.cluster.local:8080/users",
             ]
       restartPolicy: OnFailure
-  backoffLimit: 2
+  backoffLimit: 0
