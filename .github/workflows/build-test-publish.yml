@@ -109,12 +109,16 @@ jobs:
 
       - name: Smoke test deployment in k3d Kubernetes
         run: |
-          
+
           # Create namespace named test
           kubectl apply -f manifests/namespace.yaml
-          
+
+          # Set the default namespace for all subsequent kubectl commands in this job
+          kubectl config set-context --current --namespace=test
+
           # Create secrets and deploy OpenLDAP
-          kubectl create secret generic ldap-secret --from-literal=password=${{ secrets.LDAP_ADMIN_PASSWORD }}
+          kubectl create secret generic ldap-secret \
+            --from-literal=password=${{ secrets.LDAP_ADMIN_PASSWORD }}
 
           kubectl create secret docker-registry dockerhub-cred \
             --docker-server=https://index.docker.io/v1/ \
@@ -142,12 +146,12 @@ jobs:
           kubectl get pods -o wide
 
           echo "--- Running final smoke test ---"
-          kubectl run tester --image=bretfisher/netshoot -it --rm -- curl --fail -v http://user-manage-ldap:8080/users
+          kubectl run tester --image=bretfisher/netshoot -it --rm -- \
+            curl --fail -v http://user-manage-ldap.test.svc.cluster.local:8080/users
 
           echo "Applying the Kubernetes Job..."
           kubectl apply -f manifests/test-job.yaml
 
-          # Step 2: Wait for the Job to complete.
           # `kubectl wait` will automatically fail if the Job fails or times out,
           # which will then fail this entire workflow step.
           echo "Waiting for Job completion in namespace test-ns..."
@@ -156,7 +160,6 @@ jobs:
           wait_status=$?
           set -e
 
-          # Step 2: Always get the logs, regardless of success or failure.
           echo "--- Pod Logs ---"
           POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
           if [ -n "$POD_NAME" ]; then
