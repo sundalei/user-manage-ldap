@@ -158,31 +158,6 @@ jobs:
           # Check if the job failed or timed out
           if [ $wait_status -ne 0 ]; then
             echo "Job failed or timed out. Gathering debug information..."
-
-            # Add this command to get the Job events
-            echo "--- Job Events ---"
-            kubectl describe job curl-smoke-test
-            echo "--- End Job Events ---"
-
-            echo "--- Checking final pod status after waiting ---"
-            kubectl get pods -o wide
-
-            # Get the name of the last pod created by the job
-            POD_NAME=$(kubectl get pods -n test --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
-
-            # Use the "-p" (previous) flag to get logs from the last failed container run
-            kubectl logs $POD_NAME -n test -p
-
-
-            echo "--- Pod Logs ---"
-            POD_NAME=$(kubectl get pods -n test -l app=user-manage-ldap -o jsonpath='{.items[0].metadata.name}')
-            if [ -n "$POD_NAME" ]; then
-              kubectl logs "$POD_NAME"
-            else
-              echo "Could not find pod for job to retrieve logs."
-            fi
-            echo "--- End Pod Logs ---"
-
             exit 1
           fi
 
