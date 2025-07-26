@@ -76,6 +76,9 @@ spec:
       labels:
         app: openldap-server
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       imagePullSecrets:
         - name: dockerhub-cred
       initContainers:

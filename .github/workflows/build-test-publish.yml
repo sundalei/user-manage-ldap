@@ -146,7 +146,9 @@ jobs:
           kubectl get pods -o wide
 
           echo "--- Running final smoke test ---"
+          SERVICE_IP=$(kubectl get svc user-manage-ldap -o jsonpath='{.spec.clusterIP}')
           kubectl run tester --image=bretfisher/netshoot -it --rm -- \
+            --resolve user-manage-ldap.test.svc.cluster.local:8080:$SERVICE_IP \
             curl --fail -v http://user-manage-ldap.test.svc.cluster.local:8080/users
 
           echo "Applying the Kubernetes Job..."
