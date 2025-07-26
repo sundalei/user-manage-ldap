@@ -165,7 +165,7 @@ jobs:
             echo "--- End Job Events ---"
 
             echo "--- Pod Logs ---"
-            POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
+            POD_NAMES=$(kubectl get pods -n test -l app=user-manage-ldap -o jsonpath='{.items[*].metadata.name}')
             if [ -n "$POD_NAME" ]; then
               kubectl logs "$POD_NAME"
             else
