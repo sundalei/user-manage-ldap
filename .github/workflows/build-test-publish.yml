@@ -146,38 +146,9 @@ jobs:
           kubectl get pods -o wide
 
           echo "--- Running final smoke test ---"
-          SERVICE_IP=$(kubectl get svc user-manage-ldap -o jsonpath='{.spec.clusterIP}')
           kubectl run tester --image=bretfisher/netshoot -it --rm -- \
             curl --fail -v --connect-timeout 5 --retry 3 --retry-delay 2 \
             http://user-manage-ldap.test.svc.cluster.local:8080/users
-
-          echo "Applying the Kubernetes Job..."
-          kubectl apply -f manifests/test-job.yaml
-
-          # `kubectl wait` will automatically fail if the Job fails or times out,
-          # which will then fail this entire workflow step.
-          echo "Waiting for Job completion in namespace test-ns..."
-          set +e
-          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=2m
-          wait_status=$?
-          set -e
-
-          echo "--- Pod Logs ---"
-          POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
-          if [ -n "$POD_NAME" ]; then
-            kubectl logs "$POD_NAME"
-          else
-            echo "Could not find pod for job to retrieve logs."
-          fi
-          echo "--- End Logs ---"
-
-          # Step 3: Now, check if the wait command failed and exit if necessary.
-          if [ $wait_status -ne 0 ]; then
-            echo "Job failed or timed out."
-            exit 1
-          fi
-
-          echo "Job completed successfully!"
 
   publish:
     name: Publish Final Image
