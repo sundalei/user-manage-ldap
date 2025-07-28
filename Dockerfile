@@ -1,4 +1,4 @@
-FROM maven:3.9.10-eclipse-temurin-21 AS build
+FROM maven:3.9.11-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline
@@ -10,7 +10,7 @@ RUN mvn test
 FROM build AS package
 RUN mvn package -DskipTests
 
-FROM eclipse-temurin:17-jre-jammy AS final
+FROM eclipse-temurin:21-jre-jammy AS final
 RUN addgroup --system spring && adduser --system --ingroup spring springuser
 USER springuser
 WORKDIR /app
