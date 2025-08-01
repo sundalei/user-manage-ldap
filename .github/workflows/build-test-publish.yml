@@ -50,8 +50,8 @@ jobs:
           output: trivy-results.sarif
           scanners: vuln
           # CRITICAL: This flag is REQUIRED to make the exit code respect the 'severity' setting.
-          # Without it, the step fails on ANY vulnerability when using SARIF format due to a known
-          # issue in the action (aquasecurity/trivy-action#386). Do not remove.
+          # Without it, the step fails on ANY vulnerability when using SARIF format due
+          # to a known issue in the action (aquasecurity/trivy-action#386). Do not remove.
           limit-severities-for-sarif: true
 
       - name: Upload Trivy scan results to Github Security tab
@@ -69,7 +69,8 @@ jobs:
     steps:
       - name: Set testing image environment variable
         id: vars
-        run: echo "INTEGRATION_TESTING_IMAGE=ghcr.io/${{ github.repository_owner }}/${{ github.run_id }}:integration-test" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "INTEGRATION_TESTING_IMAGE=ghcr.io/${{ github.repository_owner }}/${{ github.run_id }}:integration-test" >> "$GITHUB_OUTPUT"
 
       - name: Checkout git repo
         uses: actions/checkout@v4
@@ -96,7 +97,9 @@ jobs:
         run: |
           export TESTING_IMAGE=${{ steps.vars.outputs.INTEGRATION_TESTING_IMAGE }}
           export LDAP_ADMIN_PASSWORD=${{ secrets.LDAP_ADMIN_PASSWORD }}
-          docker compose -f manifests/compose.yaml up --abort-on-container-exit --exit-code-from integration-tester
+          docker compose -f manifests/compose.yaml up \
+            --abort-on-container-exit \
+            --exit-code-from integration-tester
 
       - name: Create k3d cluster
         uses: AbsaOSS/k3d-action@v2
@@ -157,7 +160,11 @@ jobs:
           set -e
 
           echo "--- Pod Logs ---"
-          POD_NAME=$(kubectl get pods --selector=job-name=curl-smoke-test -o jsonpath='{.items[0].metadata.name}')
+
+          POD_NAME=$(kubectl get pods \
+            --selector=job-name=curl-smoke-test \
+            -o jsonpath='{.items[0].metadata.name}')
+            
           if [ -n "$POD_NAME" ]; then
             kubectl logs "$POD_NAME"
           else
@@ -165,7 +172,8 @@ jobs:
           fi
           echo "--- End Logs ---"
 
-          # Step 3: Now, check if the wait command failed and exit if necessary.
+          # Step 3: Now, check if the wait command failed and exit
+          # if necessary.
           if [ $wait_status -ne 0 ]; then
             echo "Job failed or timed out."
             exit 1
