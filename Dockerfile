@@ -5,7 +5,7 @@ RUN mvn dependency:go-offline
 COPY src ./src
 
 FROM build AS test
-RUN mvn test
+RUN mvn verify
 
 FROM build AS package
 RUN mvn package -DskipTests
