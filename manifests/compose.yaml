@@ -1,6 +1,5 @@
 ---
 services:
-
   openldap:
     image: osixia/openldap:1.5.0
     container_name: openldap-server

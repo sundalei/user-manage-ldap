@@ -1,6 +1,5 @@
 ---
 services:
-
   openldap:
     environment:
       - LDAP_ORGANISATION=SpringFramework Org
