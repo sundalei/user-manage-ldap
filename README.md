@@ -21,29 +21,13 @@ This project uses Docker Compose to quickly set up an OpenLDAP server and a phpL
 Open a terminal in the root directory of the project and run:
 
 ```bash
-docker compose up -d
+docker compose -f manifests/compose.yaml -f manifests/compose.local.yaml up -d
 ```
 
 This command will download the necessary images (if not already present) and start the `openldap-server` and `phpldapadmin-ui` containers in detached mode.
 
 - OpenLDAP will be accessible on `ldap://localhost:389`.
 - phpLDAPadmin will be accessible at `http://localhost:6080`.
-
-**Populate Sample Data:**
-
-The `users.ldif` file in the root directory contains sample user data. To populate the LDAP server with this data:
-
-```bash
-docker container cp users.ldif openldap-server:/users.ldif
-docker container exec -it openldap-server ldapadd -x -D "cn=admin,dc=springframework,dc=org" -w password -f /users.ldif
-```
-
-- The first command copies the `users.ldif` file into the `openldap-server` container.
-- The second command uses `ldapadd` utility within the container to add the entries from the LDIF file.
-  - `-x`: Use simple authentication.
-  - `-D "cn=admin,dc=springframework,dc=org"`: Bind DN (Distinguished Name) for the admin user.
-  - `-w password`: Password for the admin user (as configured in `compose.yaml` and `application.yml`).
-  - `-f /users.ldif`: Specifies the LDIF file to process.
 
 **Verify Data (Optional):**
 
