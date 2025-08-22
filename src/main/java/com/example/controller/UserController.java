@@ -6,6 +6,9 @@ import com.example.service.UserService;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,8 +40,9 @@ public final class UserController {
    * @param userDTO Data Transfer Object containing user information
    */
   @PostMapping
-  public void createUser(final @RequestBody UserDTO userDTO) {
+  public ResponseEntity<Void> createUser(final @RequestBody UserDTO userDTO) {
     userService.createUser(convertToUser(userDTO));
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
   /**
