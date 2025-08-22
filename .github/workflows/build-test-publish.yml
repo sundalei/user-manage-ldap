@@ -20,7 +20,7 @@ jobs:
   # artifact. This job runs on all triggers.
   build_and_scan:
     name: Build and Scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout git repo

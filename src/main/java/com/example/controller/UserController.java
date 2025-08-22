@@ -6,7 +6,6 @@ import com.example.service.UserService;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,6 +37,7 @@ public final class UserController {
    * Creates a new user.
    *
    * @param userDTO Data Transfer Object containing user information
+   * @return Response contains status created
    */
   @PostMapping
   public ResponseEntity<Void> createUser(final @RequestBody UserDTO userDTO) {
