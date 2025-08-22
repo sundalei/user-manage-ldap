@@ -20,7 +20,7 @@ jobs:
   # artifact. This job runs on all triggers.
   build_and_scan:
     name: Build and Scan
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout git repo
@@ -106,16 +106,13 @@ jobs:
         with:
           cluster-name: "test-cluster-1"
           args: >-
+            --agents 1
             --no-lb
             --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - name: Smoke test deployment in k3d Kubernetes
         run: |
-
-          # Create namespace named test
           kubectl apply -f manifests/namespace.yaml
-
-          # Set the default namespace for all subsequent kubectl commands in this job
           kubectl config set-context --current --namespace=test
 
           # Create secrets and deploy OpenLDAP
@@ -130,7 +127,7 @@ jobs:
           kubectl apply -f manifests/ldap-deployment.yaml
 
           echo "Waiting for OpenLDAP server to be ready..."
-          kubectl rollout status deployment openldap-server --timeout=5m
+          kubectl rollout status deployment openldap-server --timeout=2m
 
           # Create secret and deploy the user-manage-ldap application
           kubectl create secret docker-registry regcred \
@@ -154,7 +151,7 @@ jobs:
           # which will then fail this entire workflow step.
           echo "Waiting for Job completion in namespace test-ns..."
           set +e
-          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=5m
+          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=2m
           wait_status=$?
           set -e
 
