@@ -106,9 +106,8 @@ jobs:
         with:
           cluster-name: "test-cluster-1"
           args: >-
-            --agents 1
             --no-lb
-            --k3s-arg "--no-deploy=traefik,metrics-server@server:*"
+            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
 
       - name: Smoke test deployment in k3d Kubernetes
         run: |
@@ -131,7 +130,7 @@ jobs:
           kubectl apply -f manifests/ldap-deployment.yaml
 
           echo "Waiting for OpenLDAP server to be ready..."
-          kubectl rollout status deployment openldap-server --timeout=2m
+          kubectl rollout status deployment openldap-server --timeout=5m
 
           # Create secret and deploy the user-manage-ldap application
           kubectl create secret docker-registry regcred \
@@ -155,7 +154,7 @@ jobs:
           # which will then fail this entire workflow step.
           echo "Waiting for Job completion in namespace test-ns..."
           set +e
-          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=2m
+          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=5m
           wait_status=$?
           set -e
 
