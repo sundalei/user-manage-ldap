@@ -16,15 +16,13 @@ permissions:
   packages: write # Required to push images to ghcr.io
 
 jobs:
-  # JOB 1: Build the image, scan for vulnerabilities, and save the image as an
-  # artifact. This job runs on all triggers.
   build_and_scan:
     name: Build and Scan
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
