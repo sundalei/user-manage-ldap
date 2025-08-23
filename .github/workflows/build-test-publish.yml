@@ -85,10 +85,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run ci ldap server
-        run: |
-          docker compose -f manifests/compose.yaml up -d
-
       - name: Build and push to ghcr for smoke test
         uses: docker/build-push-action@v6
         with:
@@ -101,7 +97,7 @@ jobs:
         run: |
           export TESTING_IMAGE=${{ steps.vars.outputs.INTEGRATION_TESTING_IMAGE }}
           export LDAP_ADMIN_PASSWORD=${{ secrets.LDAP_ADMIN_PASSWORD }}
-          docker compose -f manifests/compose.ci.yaml up \
+          docker compose -f manifests/compose.yaml -f manifests/compose.ci.yaml up \
             --abort-on-container-exit \
             --exit-code-from integration-tester
 

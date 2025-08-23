@@ -20,6 +20,4 @@ COPY --from=package --chown=springuser:spring /app/${JAR_FILE} app.jar
 ENV SPRING_PROFILES_ACTIVE=docker
 ENV LDAP_HOST=ldap
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
 ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
