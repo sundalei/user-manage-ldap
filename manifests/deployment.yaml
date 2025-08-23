@@ -26,6 +26,11 @@ spec:
               value: openldap-service
             - name: LDAP_PORT
               value: "389"
+            - name: LDAP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ldap-secret
+                  key: password
           resources:
             requests:
               memory: "1Gi"

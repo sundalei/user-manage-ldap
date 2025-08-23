@@ -4,7 +4,9 @@ spring:
     name: user-management-ldap
 
   ldap:
-    urls: ldap://${LDAP_HOST:localhost}:${LDAP_PORT:1389}
+    # Use the system properties (lowercase) set by the script
+    urls: ldap://${ldap.host:localhost}:${ldap.port:1389}
     base: dc=springframework,dc=org
     username: cn=admin,dc=springframework,dc=org
-    password: password
+    # Use the system property (lowercase) set by the script
+    password: ${ldap.password:password}
