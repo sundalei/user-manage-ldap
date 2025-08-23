@@ -87,7 +87,7 @@ jobs:
 
       - name: Run ci ldap server
         run: |
-          docker compose -f manifests/compose.yaml up
+          docker compose -f manifests/compose.yaml up -d
 
       - name: Build and push to ghcr for smoke test
         uses: docker/build-push-action@v6
