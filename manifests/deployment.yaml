@@ -24,6 +24,8 @@ spec:
               value: docker
             - name: LDAP_HOST
               value: openldap-service
+            - name: LDAP_PORT
+              value: "389"
           resources:
             requests:
               memory: "1Gi"
