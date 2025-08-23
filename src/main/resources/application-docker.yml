@@ -1,4 +1,4 @@
 ---
 spring:
   ldap:
-    urls: ldap://${LDAP_HOST:ldap}:1389
+    urls: ldap://${LDAP_HOST:ldap}:${LDAP_PORT:1389}
