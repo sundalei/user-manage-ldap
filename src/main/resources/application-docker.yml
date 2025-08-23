@@ -1,4 +1,4 @@
 ---
 spring:
   ldap:
-    urls: ldap://${LDAP_HOST:ldap}:8389
+    urls: ldap://${LDAP_HOST:ldap}:1389
