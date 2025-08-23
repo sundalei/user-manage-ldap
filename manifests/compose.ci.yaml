@@ -4,9 +4,6 @@ services:
     image: "${TESTING_IMAGE}"
     environment:
       - LDAP_HOST=openldap-server
-    depends_on:
-      openldap:
-        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
