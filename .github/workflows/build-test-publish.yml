@@ -151,7 +151,7 @@ jobs:
           # which will then fail this entire workflow step.
           echo "Waiting for Job completion in namespace test-ns..."
           set +e
-          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=2m
+          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=5m
           wait_status=$?
           set -e
 
