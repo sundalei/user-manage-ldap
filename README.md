@@ -12,7 +12,7 @@ Before you begin, ensure you have the following installed:
 
 ## 1. Setup OpenLDAP Server and Populate Data
 
-This project uses Docker Compose to quickly set up an OpenLDAP server and a phpLDAPadmin instance for browsing the LDAP directory.
+This project uses Docker Compose to quickly set up an OpenLDAP server.
 
 ### Steps
 
@@ -24,26 +24,20 @@ Open a terminal in the root directory of the project and run:
 docker compose -f manifests/compose.yaml -f manifests/compose.local.yaml up -d
 ```
 
-This command will download the necessary images (if not already present) and start the `openldap-server` and `phpldapadmin-ui` containers in detached mode.
+This command will download the necessary images (if not already present) and start the `openldap-server` container in detached mode.
 
-- OpenLDAP will be accessible on `ldap://localhost:389`.
-- phpLDAPadmin will be accessible at `http://localhost:6080`.
+- OpenLDAP will be accessible on `ldap://localhost:1389`.
 
 **Verify Data (Optional):**
 
-You can verify that the data has been loaded using `ldapsearch` or by browsing via phpLDAPadmin.
+You can verify that the data has been loaded using `ldapsearch`.
 
 - **Using ldapsearch:**
 
-  `bash
-docker exec -it openldap-server ldapsearch -x -H ldap://localhost -b "dc=springframework,dc=org" -D "cn=admin,dc=springframework,dc=org" -w password "(uid=dbrown)"
-`
-  This command searches for the user with `uid=dbrown`.
-
-- **Using phpLDAPadmin:**
-  Navigate to `http://localhost:6080` in your web browser.
-  Login with DN: `cn=admin,dc=springframework,dc=org` and Password: `password`.
-  You should see the `dc=springframework,dc=org` base and the `ou=groups` organizational unit containing the sample users.
+```bash
+docker exec -it openldap-server ldapsearch -x -H ldap://localhost:1389 -b "dc=springframework,dc=org" -D "cn=admin,dc=springframework,dc=org" -w password "(uid=dbrown)"
+````
+This command searches for the user with `uid=dbrown`.
 
 ## 2. Running the Spring Boot Application
 

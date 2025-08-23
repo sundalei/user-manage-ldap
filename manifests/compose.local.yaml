@@ -2,40 +2,16 @@
 services:
   openldap:
     environment:
-      - LDAP_ORGANISATION=SpringFramework Org
-      - LDAP_DOMAIN=springframework.org
       - LDAP_ADMIN_PASSWORD_FILE=/run/secrets/ldap_admin_password
     secrets:
       - ldap_admin_password
     healthcheck:
       test: |-
-        ldapsearch -x -H ldap://localhost \
+        ldapsearch -x -H ldap://localhost:1389 \
           -b dc=springframework,dc=org \
           -s base \
           -D cn=admin,dc=springframework,dc=org \
           -w "$(cat /run/secrets/ldap_admin_password)"
-
-  phpldapadmin:
-    build:
-      context: .
-      dockerfile: Dockerfile.phpldapadmin
-    image: custom-phpldapadmin:stable
-    container_name: phpldapadmin-ui
-    hostname: phpldapadmin-ui
-    ports:
-      - "6080:80"
-    environment:
-      - PHPLDAPADMIN_LDAP_HOSTS=openldap-server
-      - PHPLDAPADMIN_HTTPS=false
-    depends_on:
-      - openldap
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 20s
 
 secrets:
   ldap_admin_password:

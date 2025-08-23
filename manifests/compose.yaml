@@ -1,23 +1,22 @@
 ---
 services:
   openldap:
-    image: osixia/openldap:1.5.0
+    image: bitnami/openldap:2.6.10
     container_name: openldap-server
     hostname: openldap-server
     ports:
-      - "389:389"
-      - "636:636"
+      - "8389:1389"
     environment:
-      - LDAP_ORGANISATION=SpringFramework Org
-      - LDAP_DOMAIN=springframework.org
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ROOT=dc=springframework,dc=org
       - LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
-    command: --copy-service --loglevel debug
+      - BITNAMI_DEBUG=true
     volumes:
-      - ./ldap-data/import:/container/service/slapd/assets/config/bootstrap/ldif/custom
+      - ./ldap-data/import:/ldifs
     restart: unless-stopped
     healthcheck:
       test: |-
-        ldapsearch -x -H ldap://localhost \
+        ldapsearch -x -H ldap://localhost:1389 \
           -b dc=springframework,dc=org \
           -s base \
           -D cn=admin,dc=springframework,dc=org \
