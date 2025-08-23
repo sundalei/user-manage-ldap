@@ -20,4 +20,6 @@ COPY --from=package --chown=springuser:spring /app/${JAR_FILE} app.jar
 ENV SPRING_PROFILES_ACTIVE=docker
 ENV LDAP_HOST=ldap
 EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s \
+  CMD curl -f http://localhost:8080/hello || exit 1
 ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]

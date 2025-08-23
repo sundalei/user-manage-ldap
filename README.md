@@ -85,7 +85,7 @@ A brief overview of LDAP terms used in this project:
 
 The project follows a standard Spring Boot application structure:
 
-- **`com.example.DemoToShowcaseSpringLdapApplication.java`**: The main Spring Boot application class.
+- **`com.example.SpringLdapApplication.java`**: The main Spring Boot application class.
 
 - **`com.example.config`**:
 

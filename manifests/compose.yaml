@@ -5,7 +5,7 @@ services:
     container_name: openldap-server
     hostname: openldap-server
     ports:
-      - "8389:1389"
+      - "1389:1389"
     environment:
       - LDAP_ADMIN_USERNAME=admin
       - LDAP_ROOT=dc=springframework,dc=org
