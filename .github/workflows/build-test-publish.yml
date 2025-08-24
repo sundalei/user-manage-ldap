@@ -68,7 +68,9 @@ jobs:
       - name: Set testing image environment variable
         id: vars
         run: |
-          echo "INTEGRATION_TESTING_IMAGE=ghcr.io/${{ github.repository_owner }}/${{ github.run_id }}:integration-test" >> "$GITHUB_OUTPUT"
+          echo "INTEGRATION_TESTING_IMAGE= \
+            ghcr.io/${{ github.repository_owner }}/${{ github.run_id }}:integration-test" \
+            >> "$GITHUB_OUTPUT"
 
       - name: Checkout git repo
         uses: actions/checkout@v5
@@ -182,7 +184,7 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -200,7 +202,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v5
         with:
-          images: sundalei/user-manage-ldap
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/user-manage-ldap
           flavor: |
             latest=false
           tags: |
