@@ -68,9 +68,8 @@ jobs:
       - name: Set testing image environment variable
         id: vars
         run: |
-          echo "INTEGRATION_TESTING_IMAGE= \
-            ghcr.io/${{ github.repository_owner }}/${{ github.run_id }}:integration-test" \
-            >> "$GITHUB_OUTPUT"
+          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/${{ github.run_id }}:integration-test"
+          echo "INTEGRATION_TESTING_IMAGE=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Checkout git repo
         uses: actions/checkout@v5
