@@ -128,7 +128,9 @@ jobs:
         uses: AbsaOSS/k3d-action@v2
         with:
           cluster-name: "mycluster"
-          args: --agents 1
+          args: >-
+            --agents 1
+            --k3s-arg "--no-deploy=metrics-server@server:*"
 
       - name: Smoke test deployment in k3d cluster
         run: |
