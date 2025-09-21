@@ -9,8 +9,8 @@ spec:
     spec:
       containers:
         - name: curl-tester
-          image: bretfisher/netshoot
+          image: bretfisher/netshoot:stable-20230820-cefc587
           command:
             ["curl", "--fail", "-v", "http://user-manage-ldap:8080/users"]
       restartPolicy: OnFailure
-  backoffLimit: 0
+  backoffLimit: 2

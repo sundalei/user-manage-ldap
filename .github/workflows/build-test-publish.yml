@@ -127,13 +127,10 @@ jobs:
       - name: Create k3d cluster
         uses: AbsaOSS/k3d-action@v2
         with:
-          cluster-name: "test-cluster-1"
-          args: >-
-            --agents 1
-            --no-lb
-            --k3s-arg "--no-deploy=traefik,servicelb,metrics-server@server:*"
+          cluster-name: "mycluster"
+          args: --agents 1
 
-      - name: Smoke test deployment in k3d Kubernetes
+      - name: Smoke test deployment in k3d cluster
         run: |
           kubectl apply -f manifests/namespace.yaml
           kubectl config set-context --current --namespace=test
@@ -164,7 +161,7 @@ jobs:
           echo "Waiting for user-manage-ldap to be ready..."
           kubectl rollout status deployment user-manage-ldap --timeout=2m
 
-          echo "--- Checking final pod status after waiting ---"
+          echo "--- Checking pod status after waiting ---"
           kubectl get pods -o wide
 
           echo "Applying the Kubernetes Job..."
@@ -191,7 +188,7 @@ jobs:
           fi
           echo "--- End Logs ---"
 
-          # Step 3: Now, check if the wait command failed and exit
+          # check if the wait command failed and exit
           # if necessary.
           if [ $wait_status -ne 0 ]; then
             echo "Job failed or timed out."
