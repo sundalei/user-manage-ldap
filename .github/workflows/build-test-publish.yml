@@ -41,6 +41,23 @@ jobs:
         run: |
           docker image inspect ${{ github.run_id}}
 
+      - name: Generate Trivy Vulnerability Report
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ github.run_id }}
+          format: json
+          output: trivy-report.json
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+          exit-code: 0
+
+      - name: Upload Vulnerability Scan Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.json
+          retention-days: 30
+
       - name: Run Trivy for CRITICAL CVEs
         uses: aquasecurity/trivy-action@0.32.0
         with:
@@ -55,6 +72,9 @@ jobs:
           # Without it, the step fails on ANY vulnerability when using SARIF format due
           # to a known issue in the action (aquasecurity/trivy-action#386). Do not remove.
           limit-severities-for-sarif: true
+          # On a subsequent call to the action we know trivy is already installed so can skip this
+          skip-setup-trivy: true
+          ignore-unfixed: true
 
       - name: Upload Trivy scan results to Github Security tab
         uses: github/codeql-action/upload-sarif@v3
