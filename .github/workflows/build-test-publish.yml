@@ -37,6 +37,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Inspect built image
+        run: |
+          docker image inspect ${{ github.run_id}}
+
       - name: Run Trivy for CRITICAL CVEs
         uses: aquasecurity/trivy-action@0.32.0
         with:
