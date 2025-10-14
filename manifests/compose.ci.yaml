@@ -4,7 +4,7 @@ services:
     image: "${TESTING_IMAGE}"
     environment:
       - LDAP_HOST=openldap-server
-      - LDAP_PORT=1389
+      - LDAP_PORT=389
       - LDAP_PASSWORD=${LDAP_ADMIN_PASSWORD}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
