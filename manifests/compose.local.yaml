@@ -7,7 +7,7 @@ services:
       - ldap_admin_password
     healthcheck:
       test: |-
-        ldapsearch -x -H ldap://localhost:1389 \
+        ldapsearch -x -H ldap://localhost:389 \
           -b dc=springframework,dc=org \
           -s base \
           -D cn=admin,dc=springframework,dc=org \

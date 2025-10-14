@@ -5,7 +5,7 @@ spring:
 
   ldap:
     # Use the system properties (lowercase) set by the script
-    urls: ldap://${ldap.host:localhost}:${ldap.port:1389}
+    urls: ldap://${ldap.host:localhost}:${ldap.port:389}
     base: dc=springframework,dc=org
     username: cn=admin,dc=springframework,dc=org
     # Use the system property (lowercase) set by the script
