@@ -134,8 +134,9 @@ jobs:
 
       - name: Smoke test deployment in k3d cluster
         run: |
+          # Create namespace
           kubectl apply -f manifests/namespace.yaml
-          kubectl config set-context --current --namespace=test
+          kubectl config set-context --current --namespace=ci
 
           # Create secrets and deploy OpenLDAP
           kubectl create secret generic ldap-secret \
