@@ -190,7 +190,7 @@ jobs:
             -o jsonpath='{.items[0].metadata.name}')
             
           if [ -n "$POD_NAME" ]; then
-            kubectl logs "$POD_NAME"
+            kubectl logs "$POD_NAME" --namespace=ci
           else
             echo "Could not find pod for job to retrieve logs."
           fi
