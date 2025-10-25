@@ -205,6 +205,9 @@ jobs:
 
           echo "Job completed successfully!"
 
+          echo "Cleaning up cluster"
+          k3d cluster delete mycluster
+
   publish:
     name: Publish Final Image
     runs-on: ubuntu-latest
