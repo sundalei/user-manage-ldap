@@ -136,45 +136,49 @@ jobs:
         run: |
           # Create namespace
           kubectl apply -f manifests/namespace.yaml
-          kubectl config set-context --current --namespace=ci
 
-          # Create secrets and deploy OpenLDAP
-          kubectl create secret generic ldap-secret \
+          # Create secrets
+          kubectl create secret \
+            generic ldap --namespace=ci \
             --from-literal=password=${{ secrets.LDAP_ADMIN_PASSWORD }}
 
-          kubectl create secret docker-registry dockerhub-cred \
+          kubectl create secret \
+            docker-registry dockerhub --namespace=ci \
             --docker-server=https://index.docker.io/v1/ \
             --docker-username=${{ secrets.DOCKERHUB_USERNAME }} \
             --docker-password=${{ secrets.DOCKERHUB_TOKEN }}
 
-          kubectl apply -f manifests/ldap-deployment.yaml
+          # Deploy OpenLDAP server  
+          kubectl apply -f manifests/ldap.yaml
 
           echo "Waiting for OpenLDAP server to be ready..."
-          kubectl rollout status deployment openldap-server --timeout=2m
+          kubectl rollout status deployment openldap-server --timeout=0s --namespace=ci
 
           # Create secret and deploy the user-manage-ldap application
-          kubectl create secret docker-registry regcred \
+          kubectl create secret \
+            docker-registry regcred --namespace=ci \
             --docker-server=https://ghcr.io \
             --docker-username=${{ github.actor }} \
             --docker-password=${{ secrets.GITHUB_TOKEN }}
 
           export TESTING_IMAGE=${{ steps.vars.outputs.INTEGRATION_TESTING_IMAGE }}
-          envsubst < manifests/deployment.yaml  | kubectl apply -f -
+          envsubst < manifests/user-manage-ldap.yaml  | kubectl apply -f -
 
           echo "Waiting for user-manage-ldap to be ready..."
-          kubectl rollout status deployment user-manage-ldap --timeout=2m
+          kubectl rollout status deployment user-manage-ldap --timeout=0s --namespace=ci
 
           echo "--- Checking pod status after waiting ---"
-          kubectl get pods -o wide
+          kubectl get pods --namespace=ci -o wide
 
           echo "Applying the Kubernetes Job..."
           kubectl apply -f manifests/test-job.yaml
 
           # `kubectl wait` will automatically fail if the Job fails or times out,
           # which will then fail this entire workflow step.
-          echo "Waiting for Job completion in namespace test-ns..."
+          echo "Waiting for Job completion in namespace ci..."
           set +e
-          kubectl wait --for=condition=complete job/curl-smoke-test --timeout=5m
+          kubectl wait --for=condition=complete \
+            job/curl-smoke-test --timeout=5m --namespace=ci
           wait_status=$?
           set -e
 
@@ -182,6 +186,7 @@ jobs:
 
           POD_NAME=$(kubectl get pods \
             --selector=job-name=curl-smoke-test \
+            --namespace=ci \
             -o jsonpath='{.items[0].metadata.name}')
             
           if [ -n "$POD_NAME" ]; then
