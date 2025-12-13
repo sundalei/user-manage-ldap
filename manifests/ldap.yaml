@@ -98,12 +98,16 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "1000m"
+          securityContext:
+            allowPrivilegeEscalation: false
       containers:
         - name: openldap
           image: osixia/openldap:1.5.0
           ports:
             - containerPort: 389
             - containerPort: 636
+          securityContext:
+            allowPrivilegeEscalation: false
           env:
             - name: LDAP_ORGANISATION
               value: "SpringFramework Org"
