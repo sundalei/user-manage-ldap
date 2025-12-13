@@ -39,6 +39,7 @@ jobs:
           VALIDATE_NATURAL_LANGUAGE: false
           FIX_MARKDOWN_PRETTIER: true
           FIX_YAML_PRETTIER: true
+          FIX_GOOGLE_JAVA_FORMAT: true
 
       - name: Commit and push linting fixes
         if: >
