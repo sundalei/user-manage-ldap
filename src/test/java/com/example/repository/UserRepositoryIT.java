@@ -8,7 +8,7 @@ import java.util.Optional;
 import javax.naming.Name;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.ldap.DataLdapTest;
+import org.springframework.boot.data.ldap.test.autoconfigure.DataLdapTest;
 import org.springframework.ldap.support.LdapNameBuilder;
 import org.springframework.test.context.ActiveProfiles;
 

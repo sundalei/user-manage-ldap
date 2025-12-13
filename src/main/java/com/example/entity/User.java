@@ -1,7 +1,9 @@
 package com.example.entity;
 
 import com.example.config.LdapNameSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import tools.jackson.databind.annotation.JsonSerialize;
+
 import javax.naming.Name;
 import org.springframework.ldap.odm.annotations.Attribute;
 import org.springframework.ldap.odm.annotations.DnAttribute;
