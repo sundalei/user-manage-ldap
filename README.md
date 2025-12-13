@@ -24,18 +24,16 @@ Open a terminal in the root directory of the project and run:
 docker compose -f manifests/compose.yaml -f manifests/compose.local.yaml up -d
 ```
 
-This command will download the necessary images (if not already present) and start the `openldap-server` container in detached mode.
+This command will download the necessary images (if not already present) and start the `openldap` container in detached mode.
 
-- OpenLDAP will be accessible on `ldap://localhost:389`.
+OpenLDAP will be accessible on `ldap://localhost:389`.
 
 **Verify Data (Optional):**
 
 You can verify that the data has been loaded using `ldapsearch`.
 
-- **Using ldapsearch:**
-
 ```bash
-docker exec -it openldap-server ldapsearch -x -H ldap://localhost:389 -b "dc=springframework,dc=org" -D "cn=admin,dc=springframework,dc=org" -w password "(uid=dbrown)"
+docker exec -it openldap ldapsearch -x -H ldap://localhost:389 -b "dc=springframework,dc=org" -D "cn=admin,dc=springframework,dc=org" -w password "(uid=dbrown)"
 ````
 This command searches for the user with `uid=dbrown`.
 
