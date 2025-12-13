@@ -16,7 +16,7 @@ jobs:
 
     permissions:
       # To write linting fixes
-      contents: read
+      contents: write
       # To write Super-linter status checks
       statuses: write
 
