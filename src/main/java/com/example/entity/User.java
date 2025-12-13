@@ -1,14 +1,12 @@
 package com.example.entity;
 
 import com.example.config.LdapNameSerializer;
-
-import tools.jackson.databind.annotation.JsonSerialize;
-
 import javax.naming.Name;
 import org.springframework.ldap.odm.annotations.Attribute;
 import org.springframework.ldap.odm.annotations.DnAttribute;
 import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Entry(
     base = "ou=groups",
