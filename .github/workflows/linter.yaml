@@ -3,7 +3,8 @@ name: "Lint and Format"
 
 on: # yamllint disable-line rule:truthy
   push:
-    branches: null
+    branches:
+      - main
   pull_request: null
 
 permissions: {}

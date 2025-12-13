@@ -9,11 +9,7 @@ on:
       - "v*"
   pull_request:
 
-permissions:
-  contents: read
-  pull-requests: write # Required to post comments on PRs
-  security-events: write # Required to upload SARIF reports
-  packages: write # Required to push images to ghcr.io
+permissions: {}
 
 jobs:
   build_and_scan:
@@ -23,6 +19,8 @@ jobs:
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -97,6 +95,8 @@ jobs:
 
       - name: Checkout git repo
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -216,6 +216,8 @@ jobs:
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
