@@ -3,7 +3,7 @@ services:
   user-ldap:
     image: "${TESTING_IMAGE}"
     environment:
-      - LDAP_HOST=openldap-server
+      - LDAP_HOST=openldap
       - LDAP_PORT=389
       - LDAP_PASSWORD=${LDAP_ADMIN_PASSWORD}
     healthcheck:
