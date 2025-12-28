@@ -1,4 +1,5 @@
 # Spring Boot LDAP User Management Demo
+
 [![Super-Linter](https://github.com/sundalei/user-manage-ldap/actions/workflows/linter.yaml/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 This project is a demonstration of how to build a Spring Boot application that performs user management operations against an OpenLDAP server. It showcases CRUD (Create, Read, Update, Delete) functionalities for users stored in an LDAP directory.
