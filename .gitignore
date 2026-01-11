@@ -38,3 +38,5 @@ report/
 node_modules/
 package-lock.json
 package.json
+github_conf/
+super-linter-output/
