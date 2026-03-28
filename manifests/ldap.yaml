@@ -83,7 +83,7 @@ spec:
         - name: dockerhub
       initContainers:
         - name: copy-bootstrap-ldif
-          image: busybox:1.35
+          image: busybox:1.36
           command:
             ["sh", "-c", "cp -L /configmap-input/* /bootstrap-ldif-staging/"]
           volumeMounts:
