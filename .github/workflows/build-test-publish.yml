@@ -19,7 +19,7 @@ jobs:
       security-events: write # Required to upload SARIF reports
 
     steps:
-      - name: Checkout git repo
+      - name: Checkout repository
         uses: actions/checkout@v6
         with:
           persist-credentials: false
@@ -94,7 +94,7 @@ jobs:
           IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/${{ github.run_id }}:integration-test"
           echo "INTEGRATION_TESTING_IMAGE=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout git repo
+      - name: Checkout repository
         uses: actions/checkout@v6
         with:
           persist-credentials: false
@@ -125,13 +125,16 @@ jobs:
             --abort-on-container-exit \
             --exit-code-from integration-tester
 
-      - name: Create k3d cluster
-        uses: AbsaOSS/k3d-action@v2
+      - name: Create k8s Kind Cluster
+        uses: helm/kind-action@v1
         with:
-          cluster-name: "mycluster"
-          args: >-
-            --agents 1
-            --k3s-arg "--no-deploy=metrics-server@server:*"
+          cluster_name: "mycluster"
+
+      - name: Verify Cluster Status
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+          kubectl get pods -A
 
       - name: Smoke test deployment in k3d cluster
         run: |
@@ -139,12 +142,10 @@ jobs:
           kubectl apply -f manifests/namespace.yaml
 
           # Create secrets
-          kubectl create secret \
-            generic ldap --namespace=ci \
+          kubectl create secret generic ldap --namespace=ci \
             --from-literal=password=${{ secrets.LDAP_ADMIN_PASSWORD }}
 
-          kubectl create secret \
-            docker-registry dockerhub --namespace=ci \
+          kubectl create secret docker-registry dockerhub --namespace=ci \
             --docker-server=https://index.docker.io/v1/ \
             --docker-username=${{ secrets.DOCKERHUB_USERNAME }} \
             --docker-password=${{ secrets.DOCKERHUB_TOKEN }}
@@ -152,12 +153,38 @@ jobs:
           # Deploy OpenLDAP server  
           kubectl apply -f manifests/ldap.yaml
 
+          # Given the API server a moment to create the ReplicaSet
+          sleep 2
+
           echo "Waiting for OpenLDAP server to be ready..."
-          kubectl rollout status deployment openldap-server --timeout=0s --namespace=ci
+          set +e
+          kubectl rollout status deployment openldap-server --timeout=120s --namespace=ci
+          ROLLOUT_STATUS=$?
+          set -e
+
+          # If the rollout failed, print all the debugging information
+          if [ $ROLLOUT_STATUS -ne 0 ]; then
+            echo "::error::OpenLDAP rollout timed out! Gathering debug info..."
+            
+            echo "--- Pod Status ---"
+            kubectl get pods --namespace=ci
+            
+            echo "--- Recent Events ---"
+            kubectl get events --namespace=ci --sort-by='.lastTimestamp'
+            
+            echo "--- Pod Description ---"
+            # This will show us probe failures or scheduling errors
+            kubectl describe pods --namespace=ci
+            
+            echo "--- Pod Logs ---"
+            # Grabbing logs for all pods in the namespace just in case
+            kubectl logs -l app=openldap-server --namespace=ci --all-containers --prefix || echo "No logs available. Container might not have started."
+            
+            exit 1
+          fi
 
           # Create secret and deploy the user-manage-ldap application
-          kubectl create secret \
-            docker-registry regcred --namespace=ci \
+          kubectl create secret docker-registry regcred --namespace=ci \
             --docker-server=https://ghcr.io \
             --docker-username=${{ github.actor }} \
             --docker-password=${{ secrets.GITHUB_TOKEN }}
@@ -165,8 +192,10 @@ jobs:
           export TESTING_IMAGE=${{ steps.vars.outputs.INTEGRATION_TESTING_IMAGE }}
           envsubst < manifests/user-manage-ldap.yaml  | kubectl apply -f -
 
+          sleep 2
+
           echo "Waiting for user-manage-ldap to be ready..."
-          kubectl rollout status deployment user-manage-ldap --timeout=0s --namespace=ci
+          kubectl rollout status deployment user-manage-ldap --timeout=120s --namespace=ci
 
           echo "--- Checking pod status after waiting ---"
           kubectl get pods --namespace=ci -o wide
@@ -174,40 +203,32 @@ jobs:
           echo "Applying the Kubernetes Job..."
           kubectl apply -f manifests/test-job.yaml
 
-          # `kubectl wait` will automatically fail if the Job fails or times out,
-          # which will then fail this entire workflow step.
+          # Wait a few seconds for the Job pod to be scheduled
+          sleep 5
+
+          # Wait for the Job to complete, but also capture logs if it fails or times out.
           echo "Waiting for Job completion in namespace ci..."
           set +e
-          kubectl wait --for=condition=complete \
-            job/curl-smoke-test --timeout=5m --namespace=ci
+          kubectl wait --for=condition=Complete \
+            job/curl-smoke-test --timeout=120s --namespace=ci
           wait_status=$?
           set -e
 
-          echo "--- Pod Logs ---"
-
-          POD_NAME=$(kubectl get pods \
-            --selector=job-name=curl-smoke-test \
-            --namespace=ci \
-            -o jsonpath='{.items[0].metadata.name}')
-            
-          if [ -n "$POD_NAME" ]; then
-            kubectl logs "$POD_NAME" --namespace=ci
-          else
-            echo "Could not find pod for job to retrieve logs."
-          fi
+          echo "--- Job Logs ---"
+          # Safer log retrieval: Uses the label selector directly instead of relying on array indexing
+          kubectl logs -l job-name=curl-smoke-test --namespace=ci --tail=-1 || echo "No logs found or pod failed to schedule."
           echo "--- End Logs ---"
 
-          # check if the wait command failed and exit
-          # if necessary.
-          if [ $wait_status -ne 0 ]; then
+          # Verify Job Success
+          # Check if the job actually succeeded, because kubectl wait will exit 0 if it hits the 'failed' condition too!
+          JOB_STATUS=$(kubectl get job curl-smoke-test --namespace=ci -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')
+
+          if [ "$JOB_STATUS" != "True" ] || [ $wait_status -ne 0 ]; then
             echo "Job failed or timed out."
             exit 1
           fi
 
           echo "Job completed successfully!"
-
-          echo "Cleaning up cluster"
-          k3d cluster delete mycluster
 
   publish:
     name: Publish Final Image
