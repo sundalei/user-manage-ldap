@@ -134,7 +134,7 @@ jobs:
         run: |
           kubectl cluster-info
           kubectl get nodes
-          kuctl get pods -A
+          kubectl get pods -A
 
       - name: Smoke test deployment in k3d cluster
         run: |
