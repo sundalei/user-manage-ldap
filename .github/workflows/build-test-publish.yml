@@ -157,7 +157,31 @@ jobs:
           sleep 2
 
           echo "Waiting for OpenLDAP server to be ready..."
+          set +e
           kubectl rollout status deployment openldap-server --timeout=120s --namespace=ci
+          ROLLOUT_STATUS=$?
+          set -e
+
+          # If the rollout failed, print all the debugging information
+          if [ $ROLLOUT_STATUS -ne 0 ]; then
+            echo "::error::OpenLDAP rollout timed out! Gathering debug info..."
+            
+            echo "--- Pod Status ---"
+            kubectl get pods --namespace=ci
+            
+            echo "--- Recent Events ---"
+            kubectl get events --namespace=ci --sort-by='.lastTimestamp'
+            
+            echo "--- Pod Description ---"
+            # This will show us probe failures or scheduling errors
+            kubectl describe pods --namespace=ci
+            
+            echo "--- Pod Logs ---"
+            # Grabbing logs for all pods in the namespace just in case
+            kubectl logs -l app=openldap-server --namespace=ci --all-containers --prefix || echo "No logs available. Container might not have started."
+            
+            exit 1
+          fi
 
           # Create secret and deploy the user-manage-ldap application
           kubectl create secret docker-registry regcred --namespace=ci \
