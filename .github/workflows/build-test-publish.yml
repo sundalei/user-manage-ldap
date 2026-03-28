@@ -209,7 +209,7 @@ jobs:
           # Wait for the Job to complete, but also capture logs if it fails or times out.
           echo "Waiting for Job completion in namespace ci..."
           set +e
-          kubectl wait --for=condition=complete --for=condition=failed \
+          kubectl wait --for=condition=Complete --for=condition=Failed \
             job/curl-smoke-test --timeout=120s --namespace=ci
           wait_status=$?
           set -e
