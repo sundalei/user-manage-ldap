@@ -222,7 +222,7 @@ jobs:
           # Verify Job Success
           # Check if the job actually succeeded, because kubectl wait will exit 0 if it hits the 'failed' condition too!
           JOB_STATUS=$(kubectl get job curl-smoke-test --namespace=ci -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')
-          
+
           if [ "$JOB_STATUS" != "True" ] || [ $wait_status -ne 0 ]; then
             echo "Job failed or timed out."
             exit 1
