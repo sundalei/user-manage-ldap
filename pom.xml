@@ -28,7 +28,7 @@
   </scm>
   <properties>
     <java.version>21</java.version>
-    <spotless.version>3.3.0</spotless.version>
+    <spotless.version>3.4.0</spotless.version>
   </properties>
   <dependencies>
     <dependency>
