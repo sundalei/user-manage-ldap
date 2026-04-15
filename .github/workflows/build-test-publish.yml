@@ -15,7 +15,6 @@ jobs:
   build_and_scan:
     name: Build and Scan
     runs-on: ubuntu-latest
-    environment: ci
     permissions:
       security-events: write # Required to upload SARIF reports
 
