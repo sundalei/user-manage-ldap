@@ -3,15 +3,15 @@
   "Trivy": {
     "Version": "0.69.1"
   },
-  "ReportID": "019d91b4-5377-7e0a-a997-27b535a3b58d",
-  "CreatedAt": "2026-04-15T15:13:27.415921343Z",
-  "ArtifactID": "sha256:e57222faeb59a4403af86a637cea88864a52704cadd46529dd9a4cc9290ddba1",
+  "ReportID": "019d91b6-bb21-7a48-8ad9-7afa82425a84",
+  "CreatedAt": "2026-04-15T15:16:05.025675122Z",
+  "ArtifactID": "sha256:1e0465349093bda017b357064012902bf37c1ca658fe2385d9fe7745faf168c6",
   "ArtifactName": "/github/workspace",
   "ArtifactType": "repository",
   "Metadata": {
     "RepoURL": "https://github.com/sundalei/user-manage-ldap",
-    "Commit": "90dce216b55fd6fcd5b5ae959a9b92b72c7c7b57",
-    "CommitMsg": "Merge ad47b5f1ad9abfcd5f25a7f6fe8b384aa87e5b6d into 9309afc79d385060a48f95916c31d0c2c2b3179f",
+    "Commit": "6fbb09567970b81b25c92998ada21df59fd8c819",
+    "CommitMsg": "Merge 23e734bdcede2e552fa8e3a6977e88e14a949791 into 9309afc79d385060a48f95916c31d0c2c2b3179f",
     "Author": "DaLei Sun \u003csundalei1988@gmail.com\u003e",
     "Committer": "GitHub \u003cnoreply@github.com\u003e"
   },
