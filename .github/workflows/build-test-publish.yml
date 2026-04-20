@@ -15,7 +15,6 @@ jobs:
   build_and_scan:
     name: Build and Scan
     runs-on: ubuntu-latest
-    environment: ci
     permissions:
       security-events: write # Required to upload SARIF reports
 
@@ -84,6 +83,7 @@ jobs:
     name: Integration and Smoke Tests
     runs-on: ubuntu-latest
     needs: build_and_scan
+    environment: ci
 
     permissions:
       packages: write # Required to push images to ghcr.io
