@@ -315,9 +315,9 @@ jobs:
             gh api \
               --method PATCH \
               -H "Accept: application/vnd.github+json" \
-              /repos/$REPO/issues/comments/$COMMENT_ID \
+              "/repos/$REPO/issues/comments/$COMMENT_ID" \
               -F body=@comment_body.txt
           else
             echo "Creating a new PR comment..."
-            gh pr comment $PR_NUMBER --body-file comment_body.txt
+            gh pr comment "$PR_NUMBER" --body-file comment_body.txt
           fi
