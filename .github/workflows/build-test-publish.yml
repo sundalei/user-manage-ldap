@@ -15,7 +15,6 @@ jobs:
   build_and_scan:
     name: Build and Scan
     runs-on: ubuntu-latest
-    environment: ci
     permissions:
       security-events: write # Required to upload SARIF reports
 
@@ -84,6 +83,7 @@ jobs:
     name: Integration and Smoke Tests
     runs-on: ubuntu-latest
     needs: build_and_scan
+    environment: ci
 
     permissions:
       packages: write # Required to push images to ghcr.io
@@ -235,6 +235,7 @@ jobs:
     name: Publish Final Image
     runs-on: ubuntu-latest
     needs: integration_test
+    environment: ci
 
     permissions:
       pull-requests: write # Required to post comments on PRs
@@ -289,18 +290,34 @@ jobs:
           body-includes: "Docker image tag(s) pushed"
 
       - name: Create or update comment for image tags
-        uses: peter-evans/create-or-update-comment@v5
         if: github.event_name == 'pull_request'
-        with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            Docker image tag(s) pushed:
-            ```text
-            ${{ steps.docker_meta.outputs.tags }}
-            ```
-            Labels added to images:
-            ```text
-            ${{ steps.docker_meta.outputs.labels }}
-            ```
-          edit-mode: replace
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMENT_ID: ${{ steps.fc.outputs.comment-id }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          # 1. Write the multiline body to a temporary file securely
+          cat << 'EOF' > comment_body.txt
+          Docker image tag(s) pushed:
+          ```text
+          ${{ steps.docker_meta.outputs.tags }}
+          ```
+          Labels added to images:
+          ```text
+          ${{ steps.docker_meta.outputs.labels }}
+          ```
+          EOF
+
+          # 2. Check if we have an existing comment ID to update
+          if [ -n "$COMMENT_ID" ]; then
+            echo "Updating existing comment ($COMMENT_ID)..."
+            gh api \
+              --method PATCH \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/$REPO/issues/comments/$COMMENT_ID" \
+              -F body=@comment_body.txt
+          else
+            echo "Creating a new PR comment..."
+            gh pr comment "$PR_NUMBER" --body-file comment_body.txt
+          fi
