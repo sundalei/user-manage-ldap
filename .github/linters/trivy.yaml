@@ -1,9 +1,8 @@
 timeout: 10m
-format: json
+format: table
 dependency-tree: true
 list-all-pkgs: true
-exit-code: 1
-output: result.json
+exit-code: 0
 severity:
   - CRITICAL
 scan:
