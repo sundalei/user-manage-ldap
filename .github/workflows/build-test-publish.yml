@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
 
@@ -96,7 +96,7 @@ jobs:
           echo "INTEGRATION_TESTING_IMAGE=$IMAGE_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
 
@@ -242,7 +242,7 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
 
