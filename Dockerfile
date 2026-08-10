@@ -10,7 +10,7 @@ RUN mvn verify
 FROM build AS package
 RUN mvn package -DskipTests
 
-FROM eclipse-temurin:21-jre-jammy AS final
+FROM eclipse-temurin:22-jre-jammy AS final
 RUN addgroup --system spring && adduser --system --ingroup spring springuser
 
 # Copy the entrypoint script and make it executable (as root)
